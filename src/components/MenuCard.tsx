@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import type { Menu } from '../types';
-import { ROUNDS, type Round } from '../hooks/useSlots';
 
 type Props = {
   menu: Menu;
-  isInSlot: (round: Round, menuId: string) => boolean;
-  onToggle: (round: Round, menuId: string) => void;
+  selected: boolean;
+  onToggle: (menuId: string) => void;
 };
 
 const CATEGORY_BADGE: Record<Menu['category'], string> = {
@@ -14,14 +13,13 @@ const CATEGORY_BADGE: Record<Menu['category'], string> = {
   간식: 'bg-emerald-100 text-emerald-700',
 };
 
-export default function MenuCard({ menu, isInSlot, onToggle }: Props) {
+export default function MenuCard({ menu, selected, onToggle }: Props) {
   const [open, setOpen] = useState(false);
-  const inAnySlot = ROUNDS.some((r) => isInSlot(r, menu.id));
 
   return (
     <article
       className={`rounded-2xl border bg-card p-3 transition ${
-        inAnySlot ? 'border-orange-300 shadow-sm' : 'border-line'
+        selected ? 'border-orange-400 shadow-sm' : 'border-line'
       }`}
     >
       <button
@@ -36,13 +34,8 @@ export default function MenuCard({ menu, isInSlot, onToggle }: Props) {
         >
           {menu.category}
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-ink">{menu.name}</span>
-          {menu.servings && (
-            <span className="mt-0.5 block text-[11px] text-ink-muted">
-              {menu.servings}인분
-            </span>
-          )}
+        <span className="min-w-0 flex-1 text-sm font-bold text-ink">
+          {menu.name}
         </span>
         <span className="shrink-0 text-ink-muted">{open ? '▾' : '▸'}</span>
       </button>
@@ -79,25 +72,17 @@ export default function MenuCard({ menu, isInSlot, onToggle }: Props) {
         </div>
       )}
 
-      <div className="mt-3 flex gap-1.5">
-        {ROUNDS.map((r) => {
-          const on = isInSlot(r, menu.id);
-          return (
-            <button
-              key={r}
-              type="button"
-              onClick={() => onToggle(r, menu.id)}
-              className={`flex-1 rounded-lg py-1.5 text-xs font-bold transition active:scale-95 ${
-                on
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'border border-line bg-cream-50 text-ink-muted hover:border-orange-300'
-              }`}
-            >
-              {r}차
-            </button>
-          );
-        })}
-      </div>
+      <button
+        type="button"
+        onClick={() => onToggle(menu.id)}
+        className={`mt-3 w-full rounded-lg py-2 text-xs font-bold transition active:scale-[0.98] ${
+          selected
+            ? 'bg-orange-500 text-white shadow-sm'
+            : 'border border-line bg-cream-50 text-ink-muted hover:border-orange-300'
+        }`}
+      >
+        {selected ? '✓ 먹는다 (취소)' : '+ 이번에 먹기'}
+      </button>
     </article>
   );
 }

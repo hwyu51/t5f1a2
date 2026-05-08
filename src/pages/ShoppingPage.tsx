@@ -4,7 +4,7 @@ import Card from '../components/Card';
 import Section from '../components/Section';
 import { MENUS } from '../data/menus';
 import { useIngredientChecks } from '../hooks/useIngredientChecks';
-import { useSlots } from '../hooks/useSlots';
+import { useMenuSelection } from '../hooks/useMenuSelection';
 import { aggregateIngredients, flatItems } from '../utils/aggregateIngredients';
 import type { Ingredient } from '../types';
 
@@ -19,11 +19,14 @@ const CATEGORY_ICON: Record<Ingredient['category'], string> = {
 };
 
 export default function ShoppingPage() {
-  const { slots } = useSlots();
+  const { selectedIds } = useMenuSelection();
   const { isChecked, toggle } = useIngredientChecks();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
-  const groups = useMemo(() => aggregateIngredients(slots, MENUS), [slots]);
+  const groups = useMemo(
+    () => aggregateIngredients(selectedIds, MENUS),
+    [selectedIds],
+  );
   const allItems = useMemo(() => flatItems(groups), [groups]);
   const checkedCount = allItems.filter((i) => isChecked(i.key)).length;
   const total = allItems.length;
@@ -43,7 +46,7 @@ export default function ShoppingPage() {
           <Card className="space-y-3 text-center">
             <div className="text-4xl leading-none">🛒</div>
             <div className="text-sm text-ink-muted">
-              <span className="font-bold text-ink">메뉴</span>에서 1~4차에 음식 배정하면
+              <span className="font-bold text-ink">메뉴</span>에서 먹을 거 정하면
               여기 식재료가 자동으로 모임
             </div>
             <Link

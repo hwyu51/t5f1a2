@@ -44,11 +44,6 @@ export type Ingredient = {
   optional?: boolean;
 };
 
-export type MenuSlot = {
-  round: 1 | 2 | 3 | 4;
-  menuIds: string[];
-};
-
 export type IngredientCheck = {
   key: string;
   checked: boolean;

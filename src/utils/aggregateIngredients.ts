@@ -1,4 +1,4 @@
-import type { Ingredient, Menu, MenuSlot } from '../types';
+import type { Ingredient, Menu } from '../types';
 
 export type IngredientSource = {
   menuName: string;
@@ -30,40 +30,36 @@ const CATEGORY_ORDER: Ingredient['category'][] = [
 ];
 
 export function aggregateIngredients(
-  slots: MenuSlot[],
+  menuIds: string[],
   menus: Menu[],
 ): AggregatedGroup[] {
   const map = new Map<string, AggregatedIngredient>();
 
-  // 슬롯의 메뉴 → 식재료 수집
-  for (const slot of slots) {
-    for (const menuId of slot.menuIds) {
-      const menu = menus.find((m) => m.id === menuId);
-      if (!menu) continue;
-      for (const ing of menu.ingredients) {
-        const key = `${ing.category}:${ing.name}`;
-        const existing = map.get(key);
-        const source: IngredientSource = {
-          menuName: menu.name,
-          amount: ing.amount,
-          note: ing.note,
-          optional: ing.optional,
-        };
-        if (existing) {
-          existing.sources.push(source);
-        } else {
-          map.set(key, {
-            key,
-            name: ing.name,
-            category: ing.category,
-            sources: [source],
-          });
-        }
+  for (const menuId of menuIds) {
+    const menu = menus.find((m) => m.id === menuId);
+    if (!menu) continue;
+    for (const ing of menu.ingredients) {
+      const key = `${ing.category}:${ing.name}`;
+      const existing = map.get(key);
+      const source: IngredientSource = {
+        menuName: menu.name,
+        amount: ing.amount,
+        note: ing.note,
+        optional: ing.optional,
+      };
+      if (existing) {
+        existing.sources.push(source);
+      } else {
+        map.set(key, {
+          key,
+          name: ing.name,
+          category: ing.category,
+          sources: [source],
+        });
       }
     }
   }
 
-  // 카테고리별 그룹화 + 정렬
   const grouped = new Map<Ingredient['category'], AggregatedIngredient[]>();
   for (const item of map.values()) {
     const arr = grouped.get(item.category) ?? [];
