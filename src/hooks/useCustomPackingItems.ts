@@ -1,4 +1,11 @@
-import { arrayRemove, arrayUnion, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import type { PackingItem } from '../types';
@@ -42,11 +49,7 @@ export function useCustomPackingItems() {
       ...item,
       id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
-    await setDoc(
-      doc(db, PATH),
-      { items: arrayUnion(newItem) },
-      { merge: true },
-    );
+    await setDoc(doc(db, PATH), { items: arrayUnion(newItem) }, { merge: true });
   };
 
   const remove = async (item: PackingItem) => {
@@ -54,13 +57,24 @@ export function useCustomPackingItems() {
   };
 
   const update = async (
-    oldItem: PackingItem,
+    id: string,
     patch: Partial<Pick<PackingItem, 'name' | 'assigneeId'>>,
   ) => {
-    const updated: PackingItem = { ...oldItem, ...patch };
-    // assigneeId가 빈 문자열이면 필드 자체 제거 효과 — Firestore arrayUnion은 객체 동등성이라 형태 일치 필요
-    await setDoc(doc(db, PATH), { items: arrayRemove(oldItem) }, { merge: true });
-    await setDoc(doc(db, PATH), { items: arrayUnion(updated) }, { merge: true });
+    await runTransaction(db, async (tx) => {
+      const ref = doc(db, PATH);
+      const snap = await tx.get(ref);
+      const current = snap.exists() ? ((snap.data() as State).items ?? []) : [];
+      const next = current.map((it) => {
+        if (it.id !== id) return it;
+        const merged = { ...it, ...patch };
+        // assigneeId 빈 문자열은 필드 삭제로 간주
+        if (patch.assigneeId === '' || patch.assigneeId === undefined) {
+          delete merged.assigneeId;
+        }
+        return merged;
+      });
+      tx.set(ref, { items: next });
+    });
   };
 
   return { items, add, remove, update };

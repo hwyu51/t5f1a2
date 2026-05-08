@@ -4,7 +4,7 @@ import { useFirestoreCollection } from './useFirestoreCollection';
 type ExpenseDoc = Omit<Expense, 'id'>;
 
 export function useExpenses() {
-  const { docs, add, update, remove } = useFirestoreCollection<ExpenseDoc>(
+  const { docs, ready, add, update, remove } = useFirestoreCollection<ExpenseDoc>(
     'expenses',
     { orderField: 'createdAt', orderDir: 'asc' },
   );
@@ -23,6 +23,7 @@ export function useExpenses() {
 
   return {
     expenses,
+    ready,
     add: addExpense,
     update: updateExpense,
     remove: removeExpense,

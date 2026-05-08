@@ -72,10 +72,8 @@ export default function PackingPage() {
 
   const handleEdit = async (item: PackingItem, patch: EditPatch) => {
     if (isCustom(item.id)) {
-      // 사용자 추가 항목: arrayRemove + arrayUnion
-      const original = customItems.find((c) => c.id === item.id);
-      if (!original) return;
-      await updateCustom(original, patch);
+      // 사용자 추가 항목: 트랜잭션으로 atomic 수정
+      await updateCustom(item.id, patch);
     } else {
       // 시드 항목: override
       setOverride(item.id, patch);

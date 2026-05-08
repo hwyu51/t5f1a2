@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import AddMenuForm from '../components/AddMenuForm';
 import Card from '../components/Card';
-import MenuCard from '../components/MenuCard';
+import MenuCard, { type MenuEditPatch } from '../components/MenuCard';
 import Section from '../components/Section';
 import { MENUS } from '../data/menus';
+import { useAdminMode } from '../hooks/useAdminMode';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCustomMenus } from '../hooks/useCustomMenus';
+import { useMenuOverrides } from '../hooks/useMenuOverrides';
 import { useMenuSelection } from '../hooks/useMenuSelection';
 import { logAudit } from '../utils/audit';
 import type { Menu } from '../types';
@@ -20,9 +22,28 @@ const CATEGORY_ICON: Record<Menu['category'], string> = {
 
 export default function MenusPage() {
   const { user } = useCurrentUser();
+  const { isAdmin } = useAdminMode();
   const { selectedIds, isSelected, toggle } = useMenuSelection();
-  const { menus: customMenus, add, remove } = useCustomMenus();
+  const { menus: customMenus, add, remove, update } = useCustomMenus();
+  const { overrides, setOverride } = useMenuOverrides();
   const [formOpen, setFormOpen] = useState(false);
+
+  const allMenus = useMemo(() => {
+    const seedMerged = MENUS.map((m) => ({ ...m, ...(overrides[m.id] ?? {}) }));
+    return [...seedMerged, ...customMenus];
+  }, [customMenus, overrides]);
+
+  const groups = useMemo(
+    () =>
+      CATEGORY_ORDER.map((category) => ({
+        category,
+        menus: allMenus.filter((m) => m.category === category),
+      })).filter((g) => g.menus.length > 0),
+    [allMenus],
+  );
+
+  const isCustom = (id: string) => customMenus.some((c) => c.id === id);
+  const totalSelected = selectedIds.length;
 
   const handleAdd = async (input: Omit<Menu, 'id'>) => {
     await add(input);
@@ -38,6 +59,10 @@ export default function MenusPage() {
 
   const handleRemove = async (menu: Menu) => {
     await remove(menu);
+    // dangling cleanup: 삭제된 메뉴가 selectedIds에 있으면 제거
+    if (isSelected(menu.id)) {
+      void toggle(menu.id);
+    }
     if (user) {
       void logAudit({
         actorId: user.id,
@@ -48,19 +73,21 @@ export default function MenusPage() {
     }
   };
 
-  const allMenus = useMemo(() => [...MENUS, ...customMenus], [customMenus]);
-
-  const groups = useMemo(
-    () =>
-      CATEGORY_ORDER.map((category) => ({
-        category,
-        menus: allMenus.filter((m) => m.category === category),
-      })).filter((g) => g.menus.length > 0),
-    [allMenus],
-  );
-
-  const isCustom = (id: string) => customMenus.some((c) => c.id === id);
-  const totalSelected = selectedIds.length;
+  const handleEdit = async (menu: Menu, patch: MenuEditPatch) => {
+    if (isCustom(menu.id)) {
+      await update(menu.id, patch);
+    } else {
+      setOverride(menu.id, patch);
+    }
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '메뉴 수정',
+        target: `${menu.name} → ${patch.name ?? menu.name}`,
+      });
+    }
+  };
 
   return (
     <div className="space-y-5 pb-4">
@@ -71,7 +98,6 @@ export default function MenusPage() {
         </p>
       </div>
 
-      {/* 현황 + 추가 */}
       <Section>
         <Card className="!p-3">
           <div className="flex items-center justify-between">
@@ -97,7 +123,6 @@ export default function MenusPage() {
         </Card>
       </Section>
 
-      {/* 메뉴 라이브러리 */}
       {groups.map(({ category, menus }) => (
         <Section key={category} title={`${CATEGORY_ICON[category]} ${category}`}>
           <div className="space-y-2">
@@ -107,8 +132,10 @@ export default function MenusPage() {
                 menu={menu}
                 selected={isSelected(menu.id)}
                 onToggle={toggle}
+                isAdmin={isAdmin}
                 canDelete={isCustom(menu.id)}
                 onDelete={() => handleRemove(menu)}
+                onEdit={(patch) => handleEdit(menu, patch)}
               />
             ))}
           </div>

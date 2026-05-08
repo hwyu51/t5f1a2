@@ -23,9 +23,9 @@ export default function MemberCard({ member, isSelf = false }: Props) {
         )}
       </div>
       <div className="text-sm font-bold text-ink">{member.name}</div>
-      <div className="text-[10px] font-bold tracking-widest text-ink-muted">
-        {member.confirmed ? member.mbti ?? '' : '미정'}
-      </div>
+      {!member.confirmed && (
+        <div className="text-[10px] font-bold text-ink-muted">미정</div>
+      )}
     </div>
   );
 }

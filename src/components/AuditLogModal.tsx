@@ -2,6 +2,7 @@ import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestor
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import type { AuditEntry } from '../utils/audit';
+import Spinner from './Spinner';
 
 type Props = {
   open: boolean;
@@ -12,9 +13,11 @@ const ENTRIES_LIMIT = 100;
 
 export default function AuditLogModal({ open, onClose }: Props) {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (!open) return;
+    setReady(false);
     const q = query(
       collection(db, 'auditLog'),
       orderBy('createdAt', 'desc'),
@@ -22,6 +25,7 @@ export default function AuditLogModal({ open, onClose }: Props) {
     );
     return onSnapshot(q, (snap) => {
       setEntries(snap.docs.map((d) => d.data() as AuditEntry));
+      setReady(true);
     });
   }, [open]);
 
@@ -57,7 +61,9 @@ export default function AuditLogModal({ open, onClose }: Props) {
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
-          {entries.length === 0 ? (
+          {!ready ? (
+            <Spinner label="이력 불러오는 중..." />
+          ) : entries.length === 0 ? (
             <p className="py-8 text-center text-sm text-ink-muted">
               아직 변경 이력 없음
             </p>

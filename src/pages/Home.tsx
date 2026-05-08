@@ -38,14 +38,7 @@ export default function Home() {
           <Card className="flex items-center justify-between">
             <div>
               <div className="text-xs text-ink-muted">나</div>
-              <div className="mt-0.5 flex items-baseline gap-2">
-                <span className="text-lg font-bold text-ink">{user.name}</span>
-                {user.mbti && (
-                  <span className="text-xs font-bold tracking-widest text-ink-muted">
-                    {user.mbti}
-                  </span>
-                )}
-              </div>
+              <div className="mt-0.5 text-lg font-bold text-ink">{user.name}</div>
             </div>
             <button
               type="button"

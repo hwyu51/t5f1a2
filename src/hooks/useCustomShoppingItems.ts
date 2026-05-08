@@ -1,4 +1,11 @@
-import { arrayRemove, arrayUnion, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import type { Ingredient } from '../types';
@@ -56,5 +63,18 @@ export function useCustomShoppingItems() {
     await setDoc(doc(db, PATH), { items: arrayRemove(item) }, { merge: true });
   };
 
-  return { items, add, remove };
+  const update = async (
+    id: string,
+    patch: Partial<Omit<CustomShoppingItem, 'id'>>,
+  ) => {
+    await runTransaction(db, async (tx) => {
+      const ref = doc(db, PATH);
+      const snap = await tx.get(ref);
+      const current = snap.exists() ? ((snap.data() as State).items ?? []) : [];
+      const next = current.map((it) => (it.id === id ? { ...it, ...patch } : it));
+      tx.set(ref, { items: next });
+    });
+  };
+
+  return { items, add, remove, update };
 }

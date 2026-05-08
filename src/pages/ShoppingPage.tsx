@@ -48,7 +48,7 @@ export default function ShoppingPage() {
     add: addCustomShopping,
     remove: removeCustomShopping,
   } = useCustomShoppingItems();
-  const { isChecked, toggle } = useIngredientChecks();
+  const { isChecked, toggle, removeKey } = useIngredientChecks();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   // 메뉴 식재료 + 직접 추가 항목 합쳐 카테고리별 정렬
@@ -106,6 +106,8 @@ export default function ShoppingPage() {
 
   const handleRemove = async (item: CustomShoppingItem) => {
     await removeCustomShopping(item);
+    // dangling cleanup: 체크 키도 같이 제거
+    void removeKey(`custom:${item.id}`);
     if (user) {
       void logAudit({
         actorId: user.id,

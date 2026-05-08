@@ -1,4 +1,4 @@
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { deleteField, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 
@@ -37,7 +37,6 @@ export function useIngredientChecks() {
     });
   }, []);
 
-  // setDoc merge로 부분 업데이트 (다른 키 보존)
   const toggle = async (key: string) => {
     const next = !checks[key];
     await setDoc(doc(db, PATH), { checks: { [key]: next } }, { merge: true });
@@ -45,5 +44,11 @@ export function useIngredientChecks() {
 
   const isChecked = (key: string) => Boolean(checks[key]);
 
-  return { checks, toggle, isChecked };
+  // 특정 키 자체를 제거 (장보기 항목 삭제 시 cleanup)
+  const removeKey = async (key: string) => {
+    if (!(key in checks)) return;
+    await updateDoc(doc(db, PATH), { [`checks.${key}`]: deleteField() });
+  };
+
+  return { checks, toggle, isChecked, removeKey };
 }

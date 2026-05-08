@@ -1,4 +1,11 @@
-import { arrayRemove, arrayUnion, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import type { Menu } from '../types';
@@ -49,5 +56,19 @@ export function useCustomMenus() {
     await setDoc(doc(db, PATH), { menus: arrayRemove(menu) }, { merge: true });
   };
 
-  return { menus, add, remove };
+  // 트랜잭션으로 atomic 수정 — id로 매칭, 동시 변경 race 방지
+  const update = async (
+    id: string,
+    patch: Partial<Omit<Menu, 'id'>>,
+  ) => {
+    await runTransaction(db, async (tx) => {
+      const ref = doc(db, PATH);
+      const snap = await tx.get(ref);
+      const current = snap.exists() ? ((snap.data() as State).menus ?? []) : [];
+      const next = current.map((m) => (m.id === id ? { ...m, ...patch } : m));
+      tx.set(ref, { menus: next });
+    });
+  };
+
+  return { menus, add, remove, update };
 }

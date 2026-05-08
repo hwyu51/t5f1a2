@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../components/Card';
 import ExpenseForm from '../components/ExpenseForm';
 import Section from '../components/Section';
+import Spinner from '../components/Spinner';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useExpenses } from '../hooks/useExpenses';
 import { useMembers } from '../hooks/useMembers';
@@ -12,7 +13,7 @@ import type { Expense } from '../types';
 export default function BudgetPage() {
   const { user } = useCurrentUser();
   const { members } = useMembers();
-  const { expenses, add, update, remove } = useExpenses();
+  const { expenses, ready, add, update, remove } = useExpenses();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
 
@@ -182,7 +183,11 @@ export default function BudgetPage() {
       {/* 지출 목록 */}
       <Section title={`📝 지출 내역 (${expenses.length})`}>
         <div className="space-y-1.5">
-          {expenses.length === 0 ? (
+          {!ready ? (
+            <Card className="!p-0">
+              <Spinner label="지출 불러오는 중..." />
+            </Card>
+          ) : expenses.length === 0 ? (
             <Card className="text-center text-sm text-ink-muted">
               아직 등록된 지출 없음
             </Card>
