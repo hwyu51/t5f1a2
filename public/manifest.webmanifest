@@ -1,0 +1,25 @@
+{
+  "name": "T5F1A2 — 대천 1박2일",
+  "short_name": "T5F1A2",
+  "description": "T5F1A2 모임 대천 머드축제 1박2일",
+  "start_url": "/t5f1a2/",
+  "scope": "/t5f1a2/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f2e7",
+  "theme_color": "#e07b3f",
+  "icons": [
+    {
+      "src": "/t5f1a2/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/t5f1a2/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

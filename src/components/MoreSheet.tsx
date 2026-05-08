@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAdminMode } from '../hooks/useAdminMode';
 
 type Item = {
   to: string;
@@ -9,9 +10,9 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 슬롯' },
+  { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 정하기' },
   { to: '/shopping', label: '장보기', icon: '🛒', desc: '메뉴 → 식재료 자동 집계' },
-  { to: '/budget', label: '정산', icon: '💰', desc: '지출/영수증/N분의1' },
+  { to: '/budget', label: '정산', icon: '💰', desc: '지출/N분의1' },
 ];
 
 type Props = {
@@ -20,6 +21,8 @@ type Props = {
 };
 
 export default function MoreSheet({ open, onClose }: Props) {
+  const { isAdmin, enable, disable } = useAdminMode();
+
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -30,6 +33,18 @@ export default function MoreSheet({ open, onClose }: Props) {
   }, [open]);
 
   if (!open) return null;
+
+  const handleAdminToggle = () => {
+    if (isAdmin) {
+      disable();
+      return;
+    }
+    const pwd = window.prompt('관리자 비번?');
+    if (pwd === null) return;
+    if (!enable(pwd)) {
+      window.alert('비번 틀림');
+    }
+  };
 
   return (
     <div
@@ -73,6 +88,18 @@ export default function MoreSheet({ open, onClose }: Props) {
             </li>
           ))}
         </ul>
+
+        <button
+          type="button"
+          onClick={handleAdminToggle}
+          className={`mt-4 w-full rounded-xl px-3 py-2.5 text-xs font-bold transition active:scale-[0.98] ${
+            isAdmin
+              ? 'border border-orange-500 bg-orange-50 text-orange-700'
+              : 'border border-line bg-cream-50 text-ink-muted hover:border-ink-muted'
+          }`}
+        >
+          {isAdmin ? '🔧 관리자 모드 ON · 끄기' : '🔧 관리자 모드'}
+        </button>
       </div>
     </div>
   );
