@@ -5,6 +5,8 @@ type Props = {
   menu: Menu;
   selected: boolean;
   onToggle: (menuId: string) => void;
+  canDelete?: boolean;
+  onDelete?: () => void;
 };
 
 const CATEGORY_BADGE: Record<Menu['category'], string> = {
@@ -13,7 +15,7 @@ const CATEGORY_BADGE: Record<Menu['category'], string> = {
   간식: 'bg-emerald-100 text-emerald-700',
 };
 
-export default function MenuCard({ menu, selected, onToggle }: Props) {
+export default function MenuCard({ menu, selected, onToggle, canDelete, onDelete }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -72,17 +74,31 @@ export default function MenuCard({ menu, selected, onToggle }: Props) {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => onToggle(menu.id)}
-        className={`mt-3 w-full rounded-lg py-2 text-xs font-bold transition active:scale-[0.98] ${
-          selected
-            ? 'bg-orange-500 text-white shadow-sm'
-            : 'border border-line bg-cream-50 text-ink-muted hover:border-orange-300'
-        }`}
-      >
-        {selected ? '✓ 먹는다 (취소)' : '+ 이번에 먹기'}
-      </button>
+      <div className="mt-3 flex gap-1.5">
+        <button
+          type="button"
+          onClick={() => onToggle(menu.id)}
+          className={`flex-1 rounded-lg py-2 text-xs font-bold transition active:scale-[0.98] ${
+            selected
+              ? 'bg-orange-500 text-white shadow-sm'
+              : 'border border-line bg-cream-50 text-ink-muted hover:border-orange-300'
+          }`}
+        >
+          {selected ? '✓ 먹는다 (취소)' : '+ 이번에 먹기'}
+        </button>
+        {canDelete && (
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm(`'${menu.name}' 메뉴를 지울까?`)) onDelete?.();
+            }}
+            className="shrink-0 rounded-lg border border-line px-3 py-2 text-xs text-red-500 hover:bg-red-50"
+            aria-label="메뉴 삭제"
+          >
+            ✕
+          </button>
+        )}
+      </div>
     </article>
   );
 }

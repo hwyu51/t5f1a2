@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MEMBERS } from '../data/members';
-import { TRIP } from '../data/trip';
+import { useMembers } from '../hooks/useMembers';
 import type { Expense } from '../types';
 
 type Props = {
@@ -10,22 +9,22 @@ type Props = {
   onSubmit: (input: Omit<Expense, 'id' | 'createdAt'>) => void;
 };
 
-const CONFIRMED = MEMBERS.filter((m) => m.confirmed);
-
 export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props) {
+  const { members } = useMembers();
+  const confirmed = members.filter((m) => m.confirmed);
   const [payerId, setPayerId] = useState<string>('');
-  const [amount, setAmount] = useState<string>('');
+  const [amountStr, setAmountStr] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
   const [splitMode, setSplitMode] = useState<'all' | 'subset'>('all');
   const [participantIds, setParticipantIds] = useState<string[]>([]);
-  const [date, setDate] = useState<string>(TRIP.startDate);
+  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [pending, setPending] = useState<boolean>(false);
 
   useEffect(() => {
     if (!open) return;
     if (initial) {
       setPayerId(initial.payerId);
-      setAmount(initial.amount.toString());
+      setAmountStr(initial.amount.toLocaleString('ko-KR'));
       setMemo(initial.memo);
       setSplitMode(initial.splitMode);
       setParticipantIds(initial.participantIds ?? []);
@@ -33,11 +32,11 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
       setPending(Boolean(initial.pending));
     } else {
       setPayerId('');
-      setAmount('');
+      setAmountStr('');
       setMemo('');
       setSplitMode('all');
       setParticipantIds([]);
-      setDate(TRIP.startDate);
+      setDate(new Date().toISOString().slice(0, 10));
       setPending(false);
     }
   }, [open, initial]);
@@ -61,7 +60,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const numAmount = Number(amount);
+    const numAmount = Number(amountStr.replace(/,/g, ''));
     if (!Number.isFinite(numAmount) || numAmount <= 0) return;
     if (!memo.trim()) return;
 
@@ -75,6 +74,11 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
       pending,
     });
     onClose();
+  };
+
+  const handleAmountChange = (raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, '');
+    setAmountStr(digits ? Number(digits).toLocaleString('ko-KR') : '');
   };
 
   return (
@@ -108,7 +112,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
               className="w-full rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm"
             >
               <option value="">아직 안 정함 (예정)</option>
-              {CONFIRMED.map((m) => (
+              {confirmed.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.emoji} {m.name}
                 </option>
@@ -118,14 +122,13 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
 
           <Field label="금액 (원)">
             <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              type="text"
+              value={amountStr}
+              onChange={(e) => handleAmountChange(e.target.value)}
               inputMode="numeric"
               required
-              min="0"
               className="w-full rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm tabular-nums"
-              placeholder="40000"
+              placeholder="40,000"
             />
           </Field>
 
@@ -179,7 +182,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
           {splitMode === 'subset' && (
             <Field label={`참여자 (${participantIds.length}명)`}>
               <ul className="grid grid-cols-4 gap-1.5">
-                {CONFIRMED.map((m) => {
+                {confirmed.map((m) => {
                   const on = participantIds.includes(m.id);
                   return (
                     <li key={m.id}>
@@ -207,8 +210,6 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              min={TRIP.startDate}
-              max={TRIP.endDate}
               className="w-full rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm tabular-nums"
             />
           </Field>

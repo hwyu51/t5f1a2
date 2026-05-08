@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { MEMBERS } from '../data/members';
+import { useMembers } from '../hooks/useMembers';
 import type { Member } from '../types';
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
 };
 
 export default function MemberSelectModal({ open, onSelect, onClose, closable = false }: Props) {
+  const { members } = useMembers();
+
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -38,7 +40,7 @@ export default function MemberSelectModal({ open, onSelect, onClose, closable = 
         </header>
 
         <ul className="grid grid-cols-3 gap-2.5">
-          {MEMBERS.map((m) => (
+          {members.map((m) => (
             <li key={m.id}>
               <button
                 type="button"

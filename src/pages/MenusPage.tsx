@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import AddMenuForm from '../components/AddMenuForm';
 import Card from '../components/Card';
 import MenuCard from '../components/MenuCard';
 import Section from '../components/Section';
 import { MENUS } from '../data/menus';
+import { useCustomMenus } from '../hooks/useCustomMenus';
 import { useMenuSelection } from '../hooks/useMenuSelection';
 import type { Menu } from '../types';
 
@@ -16,16 +18,21 @@ const CATEGORY_ICON: Record<Menu['category'], string> = {
 
 export default function MenusPage() {
   const { selectedIds, isSelected, toggle } = useMenuSelection();
+  const { menus: customMenus, add, remove } = useCustomMenus();
+  const [formOpen, setFormOpen] = useState(false);
+
+  const allMenus = useMemo(() => [...MENUS, ...customMenus], [customMenus]);
 
   const groups = useMemo(
     () =>
       CATEGORY_ORDER.map((category) => ({
         category,
-        menus: MENUS.filter((m) => m.category === category),
+        menus: allMenus.filter((m) => m.category === category),
       })).filter((g) => g.menus.length > 0),
-    [],
+    [allMenus],
   );
 
+  const isCustom = (id: string) => customMenus.some((c) => c.id === id);
   const totalSelected = selectedIds.length;
 
   return (
@@ -37,18 +44,27 @@ export default function MenusPage() {
         </p>
       </div>
 
-      {/* 현황 — 단순 한 줄 */}
+      {/* 현황 + 추가 */}
       <Section>
         <Card className="!p-3">
-          <div className="flex items-baseline justify-between">
-            <span className="text-sm font-bold text-ink">먹는다 정한 메뉴</span>
-            <span className="text-base font-black tabular-nums text-orange-600">
-              {totalSelected}개
-            </span>
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-sm font-bold text-ink">먹는다 정한 메뉴</span>
+              <span className="ml-2 text-base font-black tabular-nums text-orange-600">
+                {totalSelected}개
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormOpen(true)}
+              className="rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm active:scale-95"
+            >
+              + 메뉴 추가
+            </button>
           </div>
           {totalSelected === 0 && (
-            <p className="mt-1 text-[11px] text-ink-muted">
-              메뉴 카드 누르면 식재료 보임. 아래 버튼으로 정함.
+            <p className="mt-1.5 text-[11px] text-ink-muted">
+              먹고 싶은 메뉴 없으면 위 + 버튼으로 추가해.
             </p>
           )}
         </Card>
@@ -64,11 +80,19 @@ export default function MenusPage() {
                 menu={menu}
                 selected={isSelected(menu.id)}
                 onToggle={toggle}
+                canDelete={isCustom(menu.id)}
+                onDelete={() => remove(menu)}
               />
             ))}
           </div>
         </Section>
       ))}
+
+      <AddMenuForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onAdd={add}
+      />
     </div>
   );
 }

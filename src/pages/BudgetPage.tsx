@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react';
 import Card from '../components/Card';
 import ExpenseForm from '../components/ExpenseForm';
 import Section from '../components/Section';
-import { MEMBERS } from '../data/members';
 import { useExpenses } from '../hooks/useExpenses';
+import { useMembers } from '../hooks/useMembers';
 import { calculateBalances, calculateTransfers } from '../utils/settlement';
 import type { Expense } from '../types';
 
 export default function BudgetPage() {
+  const { members } = useMembers();
   const { expenses, add, update, remove } = useExpenses();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
@@ -22,12 +23,12 @@ export default function BudgetPage() {
   }, [expenses]);
 
   const balances = useMemo(
-    () => calculateBalances(expenses, MEMBERS),
+    () => calculateBalances(expenses, members),
     [expenses],
   );
   const transfers = useMemo(() => calculateTransfers(balances), [balances]);
 
-  const memberById = (id: string) => MEMBERS.find((m) => m.id === id);
+  const memberById = (id: string) => members.find((m) => m.id === id);
 
   const handleSubmit = (input: Omit<Expense, 'id' | 'createdAt'>) => {
     if (editing) {

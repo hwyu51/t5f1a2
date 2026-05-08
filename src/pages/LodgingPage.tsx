@@ -2,10 +2,11 @@ import Card from '../components/Card';
 import NavLinks from '../components/NavLinks';
 import Section from '../components/Section';
 import { LODGING } from '../data/lodging';
-import { MEMBERS } from '../data/members';
+import { useMembers } from '../hooks/useMembers';
 
 export default function LodgingPage() {
-  const payer = MEMBERS.find((m) => m.id === LODGING.payerId);
+  const { members } = useMembers();
+  const payer = members.find((m) => m.id === LODGING.payerId);
   const phoneHref = `tel:${LODGING.phone.replace(/-/g, '')}`;
 
   return (
