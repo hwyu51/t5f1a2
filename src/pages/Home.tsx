@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import DDayBanner from '../components/DDayBanner';
 import MemberCard from '../components/MemberCard';
+import MiniSchedule from '../components/MiniSchedule';
 import Section from '../components/Section';
 import { MEMBERS } from '../data/members';
 import { PLACES } from '../data/places';
@@ -14,15 +14,6 @@ const ALERTS = [
   { icon: '⚾', title: '야구 유니폼', desc: '바닷가 노상 드레스코드 (혜원·지환이 보유, 빌리세요)' },
   { icon: '👕', title: '버릴 옷 + 내복', desc: '머드축제용. 위아래 + 갈아입을 비닐' },
   { icon: '🩴', title: '크록스 or 슬리퍼', desc: '운동화 X. 머드축제장에서 신을 신발' },
-];
-
-const QUICK_LINKS = [
-  { to: '/schedule', label: '일정', icon: '📅' },
-  { to: '/lodging', label: '숙소', icon: '🏠' },
-  { to: '/menus', label: '메뉴', icon: '🍖' },
-  { to: '/shopping', label: '장보기', icon: '🛒' },
-  { to: '/packing', label: '준비물', icon: '🎒' },
-  { to: '/cars', label: '차량', icon: '🚗' },
 ];
 
 export default function Home() {
@@ -80,6 +71,11 @@ export default function Home() {
         </Card>
       </Section>
 
+      {/* 일정 미리보기 */}
+      <Section title="📅 일정 미리보기">
+        <MiniSchedule />
+      </Section>
+
       {/* 멤버 목록 */}
       <Section title={`👥 멤버 (${MEMBERS.filter((m) => m.confirmed).length}/${MEMBERS.length})`}>
         <div className="grid grid-cols-4 gap-2">
@@ -102,23 +98,6 @@ export default function Home() {
             </div>
           ))}
         </Card>
-      </Section>
-
-      {/* 빠른 링크 */}
-      <Section title="📍 바로가기">
-        <ul className="grid grid-cols-3 gap-2.5">
-          {QUICK_LINKS.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                className="flex min-h-[80px] flex-col items-center justify-center gap-1 rounded-2xl border border-line bg-card p-2 text-center transition active:scale-95 hover:border-orange-500"
-              >
-                <span className="text-2xl leading-none">{link.icon}</span>
-                <span className="text-xs font-semibold text-ink">{link.label}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </Section>
     </div>
   );

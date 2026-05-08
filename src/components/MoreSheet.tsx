@@ -1,0 +1,79 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+type Item = {
+  to: string;
+  label: string;
+  icon: string;
+  desc: string;
+};
+
+const ITEMS: Item[] = [
+  { to: '/lodging', label: '숙소', icon: '🏠', desc: '해녀펜션 · 체크인 정보' },
+  { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 슬롯' },
+  { to: '/packing', label: '준비물', icon: '🎒', desc: '공용/개인 체크' },
+];
+
+type Props = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export default function MoreSheet({ open, onClose }: Props) {
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[28rem] rounded-t-3xl bg-card p-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-bold text-ink">더보기</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-2 py-1 text-sm text-ink-muted hover:bg-cream-100"
+          >
+            닫기
+          </button>
+        </header>
+
+        <ul className="space-y-2">
+          {ITEMS.map((item) => (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                onClick={onClose}
+                className="flex items-center gap-3 rounded-2xl border border-line bg-cream-50/60 p-3 transition active:scale-[0.98] hover:border-orange-400"
+              >
+                <span className="text-2xl leading-none">{item.icon}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold text-ink">
+                    {item.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-muted">
+                    {item.desc}
+                  </span>
+                </span>
+                <span className="text-ink-muted">›</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
