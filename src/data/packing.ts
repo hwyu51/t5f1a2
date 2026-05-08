@@ -10,7 +10,6 @@ export const PACKING: PackingItem[] = [
   { id: 'p06', name: '카바나 위스키', type: '공용', assigneeId: 'jihwan' },
   { id: 'p08', name: '물티슈/키친타월', type: '공용' },
   { id: 'p13', name: '호일 (꽃게 호일구이용)', type: '공용' },
-  { id: 'p14', name: '휴지심 (카바나용)', type: '공용' },
 
   // === 개인 ===
   {
