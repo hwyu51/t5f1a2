@@ -1,0 +1,128 @@
+import type { Menu } from '../types';
+
+export const MENUS: Menu[] = [
+  // === 1차 바베큐 (거의 확정) ===
+  {
+    id: 'bbq-pork',
+    name: '삼겹살/목살 바베큐',
+    category: '식사',
+    servings: 8,
+    notes: '1인당 200~250g. 굵은소금 + 쌈장 필수. 펜션 실내 그릴 사용',
+    ingredients: [
+      { name: '삼겹살', amount: '2kg', category: '정육' },
+      { name: '목살', amount: '1kg', category: '정육' },
+      { name: '상추', amount: '충분히', category: '채소' },
+      { name: '깻잎', amount: '2단', category: '채소' },
+      { name: '마늘', amount: '1망', category: '채소' },
+      { name: '쌈장', amount: '1통', category: '소스/양념' },
+      { name: '굵은소금', amount: '1봉', category: '소스/양념' },
+      { name: '참기름', amount: '1병', category: '소스/양념' },
+    ],
+  },
+  {
+    id: 'smoked-pork',
+    name: '훈제 통삼겹 (훈제박스)',
+    category: '식사',
+    servings: 8,
+    notes: '훈제박스 1시간 → 뽑은 상태로 머드 후 복귀하면 식감 등',
+    ingredients: [
+      { name: '통삼겹', amount: '2kg', category: '정육' },
+      { name: '훈제박스', amount: '1개', category: '잡화', note: '⚠️ 일회용 구매 필요' },
+      { name: '훈제칩', amount: '1봉', category: '잡화', optional: true },
+    ],
+  },
+  {
+    id: 'oven-belly',
+    name: '통오겹 오븐구이 (지빈 담당)',
+    category: '식사',
+    servings: 8,
+    notes: '고소 단지 스타일. 펜션 오븐 사용 가능 여부 확인 필요',
+    ingredients: [
+      { name: '통오겹', amount: '2kg', category: '정육' },
+      { name: '허브솔트', amount: '1통', category: '소스/양념' },
+      { name: '로즈마리', amount: '1팩', category: '채소' },
+    ],
+  },
+  {
+    id: 'bbq-crab',
+    name: '꽃게 호일구이 (혜원이 하고 싶은)',
+    category: '식사',
+    servings: 8,
+    notes: '호일에 싸서 그릴에 올리기. 마요네즈 곁들이기',
+    ingredients: [
+      { name: '꽃게', amount: '8마리', category: '정육' /* 어패류 통합 */ },
+      { name: '호일', amount: '1롤', category: '잡화' },
+      { name: '마요네즈', amount: '1통', category: '소스/양념' },
+      { name: '버터', amount: '1통', category: '소스/양념' },
+    ],
+  },
+  // === 닭 라인 (지환이 닭 만드는) ===
+  {
+    id: 'chicken-skewer',
+    name: '닭꼬치 (소금/데리야키)',
+    category: '식사',
+    servings: 8,
+    notes: '냉동 사가도 OK / 혜원이 직접 만들어 얼려와도 OK',
+    ingredients: [
+      { name: '닭다리살', amount: '1kg', category: '정육' },
+      { name: '대파', amount: '5대', category: '채소' },
+      { name: '꼬치 막대', amount: '1봉', category: '잡화' },
+      { name: '데리야키소스', amount: '1병', category: '소스/양념' },
+      { name: '굵은소금', amount: '1봉', category: '소스/양념' },
+    ],
+  },
+  {
+    id: 'dakbokkeumtang',
+    name: '닭볶음탕 / 안닭',
+    category: '식사',
+    servings: 8,
+    notes: '둘 중 하나 (선택). 안주로 좋음',
+    ingredients: [
+      { name: '닭(볶음탕용)', amount: '2마리', category: '정육' },
+      { name: '감자', amount: '5개', category: '채소' },
+      { name: '당근', amount: '2개', category: '채소' },
+      { name: '양파', amount: '3개', category: '채소' },
+      { name: '간장', amount: '1병', category: '소스/양념' },
+      { name: '고추장', amount: '1통', category: '소스/양념' },
+      { name: '고춧가루', amount: '1봉', category: '소스/양념' },
+    ],
+  },
+  // === 안주류 ===
+  {
+    id: 'kimbap',
+    name: '잠보덤보 김밥 (지연+병도 담당)',
+    category: '간식',
+    servings: 8,
+    ingredients: [
+      { name: '김밥김', amount: '2봉', category: '잡화' },
+      { name: '밥', amount: '5인분', category: '잡화' },
+      { name: '단무지', amount: '2봉', category: '채소' },
+      { name: '맛이', amount: '2팩', category: '정육' },
+      { name: '계란', amount: '10개', category: '잡화' },
+      { name: '시금치', amount: '1단', category: '채소' },
+      { name: '참기름', amount: '1병', category: '소스/양념' },
+    ],
+  },
+  {
+    id: 'oden',
+    name: '오뎅탕',
+    category: '안주',
+    servings: 8,
+    notes: '국물 시원함. 술안주로 굿',
+    ingredients: [
+      { name: '모듬어묵', amount: '2봉', category: '정육' },
+      { name: '무', amount: '1개', category: '채소' },
+      { name: '대파', amount: '3대', category: '채소' },
+      { name: '다시팩', amount: '1봉', category: '소스/양념' },
+    ],
+  },
+  {
+    id: 'izakaya-skewer',
+    name: '이자카야 꼬치 (혜원 사전 준비)',
+    category: '안주',
+    servings: 8,
+    notes: '냉동으로 만들어 가져오기. 종류별로 다양',
+    ingredients: [{ name: '꼬치 재료 (혜원 자체 준비)', amount: '1세트', category: '정육' }],
+  },
+  // TODO: 우슈 구이, 안조 등 추가 메뉴 후보 (지빈 통오겹과 별개)
+];
