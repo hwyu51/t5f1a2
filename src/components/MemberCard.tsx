@@ -16,8 +16,8 @@ export default function MemberCard({ member, isSelf = false }: Props) {
             : 'border-dashed border-line bg-cream-50/60'
       }`}
     >
-      <div className="text-2xl">
-        {isSelf ? '⭐' : member.confirmed ? '🙂' : '❓'}
+      <div className="text-2xl leading-none">
+        {member.confirmed ? (member.emoji ?? '🙂') : '❓'}
       </div>
       <div className="text-sm font-bold text-ink">{member.name}</div>
       <div className="text-[10px] text-ink-muted">

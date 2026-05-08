@@ -55,17 +55,6 @@ export default function LodgingPage() {
                 {LODGING.phone}
               </a>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-ink-muted">예약 사이트</span>
-              <a
-                href={LODGING.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-orange-600 underline-offset-2 hover:underline"
-              >
-                바로가기 ↗
-              </a>
-            </div>
           </div>
         </Card>
       </Section>

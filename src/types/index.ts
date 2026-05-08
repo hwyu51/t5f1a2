@@ -1,6 +1,7 @@
 export type Member = {
   id: string;
   name: string;
+  emoji?: string;
   isDriver?: boolean;
   carId?: 'car1' | 'car2';
   confirmed: boolean;

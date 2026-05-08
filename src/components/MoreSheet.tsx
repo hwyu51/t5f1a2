@@ -9,9 +9,9 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { to: '/lodging', label: '숙소', icon: '🏠', desc: '해녀펜션 · 체크인 정보' },
   { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 슬롯' },
-  { to: '/packing', label: '준비물', icon: '🎒', desc: '공용/개인 체크' },
+  { to: '/shopping', label: '장보기', icon: '🛒', desc: '메뉴 → 식재료 자동 집계' },
+  { to: '/budget', label: '정산', icon: '💰', desc: '지출/영수증/N분의1' },
 ];
 
 type Props = {

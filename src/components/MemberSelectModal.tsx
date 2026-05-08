@@ -49,7 +49,9 @@ export default function MemberSelectModal({ open, onSelect, onClose, closable = 
                     : 'border-dashed border-line bg-cream-50/50 text-ink-muted hover:border-orange-500'
                 }`}
               >
-                <span className="text-2xl">{m.confirmed ? '🙂' : '❓'}</span>
+                <span className="text-2xl leading-none">
+                  {m.confirmed ? (m.emoji ?? '🙂') : '❓'}
+                </span>
                 <span className="text-sm font-bold text-ink">{m.name}</span>
                 {!m.confirmed && (
                   <span className="text-[10px] text-ink-muted">미확정</span>
