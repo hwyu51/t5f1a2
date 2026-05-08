@@ -86,13 +86,6 @@ export const SCHEDULE: ScheduleItem[] = [
     placeId: 'beach-night',
     note: '⚠️ 드레스코드: 야구 유니폼',
   },
-  {
-    id: 's11',
-    day: 2,
-    time: '00:30',
-    title: '3차 — 더 마시거나 숙소로',
-    placeId: 'beach-night',
-  },
 
   // === 2일차 (7/26 일) ===
   {

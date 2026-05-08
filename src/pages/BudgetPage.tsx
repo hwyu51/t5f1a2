@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useEffect, useMemo, useState } from 'react';
 import Card from '../components/Card';
 import ExpenseForm from '../components/ExpenseForm';
 import Section from '../components/Section';
 import Spinner from '../components/Spinner';
+import { SEED_EXPENSES } from '../data/initialExpenses';
+import { db } from '../lib/firebase';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useExpenses } from '../hooks/useExpenses';
 import { useMembers } from '../hooks/useMembers';
@@ -14,6 +17,25 @@ export default function BudgetPage() {
   const { user } = useCurrentUser();
   const { members } = useMembers();
   const { expenses, ready, add, update, remove } = useExpenses();
+
+  // 첫 진입 시 시드 지출(펜션비/그릴비) 한 번만 등록 — 멱등 (state/seedExpensesInit 플래그)
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+    (async () => {
+      const flagRef = doc(db, 'state', 'seedExpensesInit');
+      const flagSnap = await getDoc(flagRef);
+      if (cancelled || flagSnap.exists()) return;
+      for (const seed of SEED_EXPENSES) {
+        const { id, ...rest } = seed;
+        await setDoc(doc(db, 'expenses', id), rest);
+      }
+      await setDoc(flagRef, { initializedAt: Date.now() });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready]);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
 

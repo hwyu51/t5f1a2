@@ -149,37 +149,56 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
                 + 줄 추가
               </button>
             </div>
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {ingredients.map((ing, i) => (
-                <li key={i} className="flex gap-1">
-                  <input
-                    type="text"
-                    value={ing.name}
-                    onChange={(e) =>
-                      setIngredients((prev) => {
-                        const next = [...prev];
-                        next[i] = { ...next[i], name: e.target.value };
-                        return next;
-                      })
-                    }
-                    placeholder="재료"
-                    maxLength={20}
-                    className="flex-1 rounded-md border border-line bg-cream-50 px-2 py-1.5 text-sm"
-                  />
-                  <input
-                    type="text"
-                    value={ing.amount}
-                    onChange={(e) =>
-                      setIngredients((prev) => {
-                        const next = [...prev];
-                        next[i] = { ...next[i], amount: e.target.value };
-                        return next;
-                      })
-                    }
-                    placeholder="양"
-                    maxLength={15}
-                    className="w-20 rounded-md border border-line bg-cream-50 px-2 py-1.5 text-sm tabular-nums"
-                  />
+                <li
+                  key={i}
+                  className="space-y-1 rounded-md border border-line bg-cream-50/60 p-1.5"
+                >
+                  <div className="flex gap-1">
+                    <input
+                      type="text"
+                      value={ing.name}
+                      onChange={(e) =>
+                        setIngredients((prev) => {
+                          const next = [...prev];
+                          next[i] = { ...next[i], name: e.target.value };
+                          return next;
+                        })
+                      }
+                      placeholder="재료"
+                      maxLength={20}
+                      className="min-w-0 flex-1 rounded-md border border-line bg-card px-2 py-1.5 text-sm"
+                    />
+                    <input
+                      type="text"
+                      value={ing.amount}
+                      onChange={(e) =>
+                        setIngredients((prev) => {
+                          const next = [...prev];
+                          next[i] = { ...next[i], amount: e.target.value };
+                          return next;
+                        })
+                      }
+                      placeholder="양"
+                      maxLength={15}
+                      className="w-16 rounded-md border border-line bg-card px-2 py-1.5 text-sm tabular-nums"
+                    />
+                    {ingredients.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIngredients((prev) =>
+                            prev.filter((_, idx) => idx !== i),
+                          )
+                        }
+                        className="shrink-0 rounded-md px-2 text-red-500 hover:bg-red-50"
+                        aria-label="줄 제거"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                   <select
                     value={ing.category}
                     onChange={(e) =>
@@ -192,7 +211,7 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
                         return next;
                       })
                     }
-                    className="w-20 rounded-md border border-line bg-cream-50 px-1.5 py-1.5 text-[11px]"
+                    className="w-full rounded-md border border-line bg-card px-2 py-1.5 text-xs"
                   >
                     {INGREDIENT_CATEGORIES.map((c) => (
                       <option key={c} value={c}>
@@ -200,18 +219,6 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
                       </option>
                     ))}
                   </select>
-                  {ingredients.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setIngredients((prev) => prev.filter((_, idx) => idx !== i))
-                      }
-                      className="shrink-0 rounded-md px-1.5 text-red-500 hover:bg-red-50"
-                      aria-label="줄 제거"
-                    >
-                      ✕
-                    </button>
-                  )}
                 </li>
               ))}
             </ul>

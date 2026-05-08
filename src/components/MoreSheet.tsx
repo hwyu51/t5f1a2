@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAdminMode } from '../hooks/useAdminMode';
+import AdminPasswordModal from './AdminPasswordModal';
 import AuditLogModal from './AuditLogModal';
 
 type Item = {
@@ -24,6 +25,7 @@ type Props = {
 export default function MoreSheet({ open, onClose }: Props) {
   const { isAdmin, enable, disable } = useAdminMode();
   const [auditOpen, setAuditOpen] = useState(false);
+  const [pwdOpen, setPwdOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -34,18 +36,14 @@ export default function MoreSheet({ open, onClose }: Props) {
     };
   }, [open]);
 
-  if (!open && !auditOpen) return null;
+  if (!open && !auditOpen && !pwdOpen) return null;
 
   const handleAdminToggle = () => {
     if (isAdmin) {
       disable();
       return;
     }
-    const pwd = window.prompt('관리자 비번?');
-    if (pwd === null) return;
-    if (!enable(pwd)) {
-      window.alert('비번 틀림');
-    }
+    setPwdOpen(true);
   };
 
   return (
@@ -122,6 +120,11 @@ export default function MoreSheet({ open, onClose }: Props) {
         </div>
       )}
       <AuditLogModal open={auditOpen} onClose={() => setAuditOpen(false)} />
+      <AdminPasswordModal
+        open={pwdOpen}
+        onClose={() => setPwdOpen(false)}
+        onSubmit={(pwd) => enable(pwd)}
+      />
     </>
   );
 }
