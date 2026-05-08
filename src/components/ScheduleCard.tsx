@@ -126,7 +126,7 @@ export default function ScheduleCard({
               </span>
             </span>
             <span className="text-[11px] font-medium text-ink-muted">
-              {options.length}곳 중 골라 ›
+              {options.length}곳 중 선택 ›
             </span>
           </button>
         )}
@@ -142,7 +142,7 @@ export default function ScheduleCard({
                 onClick={() => setExpanded(false)}
                 className="text-[11px] text-ink-muted hover:text-ink"
               >
-                접기
+                닫기
               </button>
             </div>
             {options.map((p) => (

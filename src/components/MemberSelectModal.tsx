@@ -33,9 +33,9 @@ export default function MemberSelectModal({ open, onSelect, onClose, closable = 
         onClick={(e) => e.stopPropagation()}
       >
         <header className="mb-4 text-center">
-          <h2 className="text-lg font-bold text-ink">너 누구?</h2>
+          <h2 className="text-lg font-bold text-ink">본인 선택</h2>
           <p className="mt-1 text-sm text-ink-muted">
-            한 번만 골라. 나중에 바꿀 수 있어
+            한 번만 선택해 주세요. 나중에 변경 가능해요.
           </p>
         </header>
 

@@ -13,9 +13,21 @@ import { logAudit } from '../utils/audit';
 const TARGET_ISO = `${TRIP.startDate}T${TRIP.departureTime}:00+09:00`;
 
 const ALERTS = [
-  { icon: '⚾', title: '야구 유니폼', desc: '노상 드레스코드 — 혜원·지환이 갖고 있으니 빌려달라 해' },
-  { icon: '👕', title: '버릴 옷 한 벌', desc: '머드축제 들어갈 옷. 끝나면 비닐에 담아 버려' },
-  { icon: '🩴', title: '크록스/슬리퍼', desc: '운동화 X. 머드 묻을 거 신어' },
+  {
+    icon: '⚾',
+    title: '야구 유니폼',
+    desc: '노상 드레스코드 — 혜원·지환이 갖고 있어요',
+  },
+  {
+    icon: '👕',
+    title: '버릴 옷 한 벌',
+    desc: '머드축제용. 끝나면 비닐에 담아 버려요',
+  },
+  {
+    icon: '🩴',
+    title: '크록스/슬리퍼',
+    desc: '운동화 말고 머드 묻을 신발이 필요해요',
+  },
 ];
 
 export default function Home() {
@@ -37,7 +49,7 @@ export default function Home() {
         <Section>
           <Card className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-ink-muted">나</div>
+              <div className="text-xs text-ink-muted">내 정보</div>
               <div className="mt-0.5 text-lg font-bold text-ink">{user.name}</div>
             </div>
             <button
@@ -45,14 +57,14 @@ export default function Home() {
               onClick={clear}
               className="rounded-lg px-3 py-1.5 text-xs text-ink-muted hover:bg-cream-100"
             >
-              바꾸기
+              변경
             </button>
           </Card>
         </Section>
       )}
 
       {/* 집합 정보 */}
-      <Section title="🚩 어디서 만나">
+      <Section title="🚩 집합 장소">
         <Card className="space-y-2">
           <div className="flex items-baseline justify-between">
             <div className="text-base font-bold text-ink">{meetingPlace?.name}</div>
@@ -69,13 +81,13 @@ export default function Home() {
         </Card>
       </Section>
 
-      {/* 일정 미리 */}
-      <Section title="📅 일정 미리">
+      {/* 일정 미리보기 */}
+      <Section title="📅 일정 미리보기">
         <MiniSchedule />
       </Section>
 
-      {/* 갈 사람 */}
-      <Section title={`🙌 갈 사람 (${members.filter((m) => m.confirmed).length}/${members.length})`}>
+      {/* 참여자 */}
+      <Section title={`🙌 참여자 (${members.filter((m) => m.confirmed).length}/${members.length})`}>
         <div className="grid grid-cols-4 gap-2">
           {members.map((m) => (
             <MemberCard key={m.id} member={m} isSelf={m.id === user?.id} />
@@ -118,7 +130,7 @@ export default function Home() {
       )}
 
       {/* 챙길 것 알림 */}
-      <Section title="⚠️ 까먹지 마">
+      <Section title="⚠️ 꼭 챙겨오세요">
         <Card className="space-y-3 border-warn-border bg-warn-bg">
           {ALERTS.map((a) => (
             <div key={a.title} className="flex gap-3">

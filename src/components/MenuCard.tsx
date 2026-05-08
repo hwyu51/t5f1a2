@@ -105,7 +105,7 @@ export default function MenuCard({
               : 'border border-line bg-cream-50 text-ink-muted hover:border-orange-300'
           }`}
         >
-          {selected ? '✓ 먹는다 (취소)' : '+ 이번에 먹기'}
+          {selected ? '✓ 선택됨 (해제)' : '+ 메뉴 선택'}
         </button>
         {isAdmin && onEdit && (
           <button

@@ -113,7 +113,7 @@ export default function MenusPage() {
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">메뉴</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          이번에 먹을 메뉴 골라. 장보기 리스트가 자동으로 만들어져
+          먹을 메뉴를 선택하면 장보기 리스트가 자동으로 만들어져요
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function MenusPage() {
         <Card className="!p-3">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-sm font-bold text-ink">먹는다 정한 메뉴</span>
+              <span className="text-sm font-bold text-ink">선택한 메뉴</span>
               <span className="ml-2 text-base font-black tabular-nums text-orange-600">
                 {totalSelected}개
               </span>
@@ -136,7 +136,7 @@ export default function MenusPage() {
           </div>
           {totalSelected === 0 && (
             <p className="mt-1.5 text-[11px] text-ink-muted">
-              먹고 싶은 메뉴 없으면 위 + 버튼으로 추가해.
+              원하는 메뉴가 없으면 + 버튼으로 추가해 주세요.
             </p>
           )}
         </Card>

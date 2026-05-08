@@ -5,17 +5,17 @@ test.describe('기본 흐름', () => {
     await page.goto('/');
 
     // 멤버 선택 모달
-    await expect(page.getByRole('heading', { name: '너 누구?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '본인 선택' })).toBeVisible();
 
     // '지환' 카드 클릭 (모달의 멤버 그리드에 있음)
     await page.getByRole('button', { name: /지환/ }).first().click();
 
     // 모달 닫히고 홈 페이지 콘텐츠 확인
     await expect(
-      page.getByRole('heading', { name: '너 누구?' }),
+      page.getByRole('heading', { name: '본인 선택' }),
     ).not.toBeVisible();
     await expect(page.getByText('대천 1박2일까지')).toBeVisible();
-    await expect(page.getByText(/어디서 만나/)).toBeVisible();
+    await expect(page.getByText(/집합 장소/)).toBeVisible();
   });
 
   test('하단 탭으로 페이지 이동', async ({ page }) => {
@@ -77,7 +77,7 @@ test.describe('기본 흐름', () => {
     await page.getByRole('button', { name: /관리자 모드/ }).click();
 
     // 비번 모달의 password input에 '0501' 입력 후 확인
-    await page.getByRole('heading', { name: /관리자 비번/ }).waitFor();
+    await page.getByRole('heading', { name: /관리자 비밀번호/ }).waitFor();
     await page.locator('input[type="password"]').fill('0501');
     await page.getByRole('button', { name: '확인' }).click();
 

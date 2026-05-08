@@ -50,7 +50,7 @@ export default function AdminPasswordModal({ open, onClose, onSubmit }: Props) {
         className="w-full max-w-xs rounded-2xl bg-card p-5 shadow-xl"
       >
         <header className="mb-3 text-center">
-          <h2 className="text-base font-bold text-ink">🔧 관리자 비번</h2>
+          <h2 className="text-base font-bold text-ink">🔧 관리자 비밀번호</h2>
         </header>
         <input
           ref={inputRef}
@@ -69,7 +69,7 @@ export default function AdminPasswordModal({ open, onClose, onSubmit }: Props) {
         />
         {error && (
           <p className="mt-2 text-center text-xs font-bold text-red-500">
-            비번 틀림
+            비밀번호가 일치하지 않아요
           </p>
         )}
         <div className="mt-4 flex gap-2">

@@ -94,14 +94,14 @@ export default function PackingPage() {
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">준비물</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          내가 챙긴 것 체크. 본인 브라우저에만 저장돼
+          챙긴 항목을 체크해 주세요. 내 기기에만 저장됩니다.
         </p>
       </div>
 
       <Section>
         <Card className="!p-3">
           <div className="mb-1.5 flex items-baseline justify-between text-xs font-medium text-ink-muted">
-            <span>내 체크</span>
+            <span>체크 현황</span>
             <span className="tabular-nums">
               {checkedCount} / {total} · {percent}%
             </span>
@@ -354,7 +354,7 @@ function AddItemForm({
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder={`+ ${type} 항목 추가`}
+        placeholder={`${type} 항목 추가`}
         maxLength={30}
         className="w-full rounded-md border border-line bg-card px-2 py-1.5 text-sm"
       />

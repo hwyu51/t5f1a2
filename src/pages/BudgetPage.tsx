@@ -131,7 +131,7 @@ export default function BudgetPage() {
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">정산</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          지출 등록 → 자동으로 정산표 만들어
+          지출을 등록하면 정산표가 자동으로 만들어져요
         </p>
       </div>
 
@@ -157,7 +157,7 @@ export default function BudgetPage() {
               <span className="text-ink-muted">
                 내 잔액 ({user?.name})
                 <span className="ml-1.5 text-[11px] text-ink-muted">
-                  냄 {Math.round(myBalance.paid).toLocaleString()} · 몫{' '}
+                  결제 {Math.round(myBalance.paid).toLocaleString()} · 분담{' '}
                   {Math.round(myBalance.share).toLocaleString()}
                 </span>
               </span>
@@ -264,7 +264,7 @@ export default function BudgetPage() {
                         )}
                       </span>
                       <span className="mt-0.5 block text-[11px] text-ink-muted">
-                        {payer ? `${payer.emoji} ${payer.name}` : '낸 사람 미정'}
+                        {payer ? `${payer.emoji} ${payer.name}` : '결제자 미정'}
                         {' · '}
                         {e.splitMode === 'all'
                           ? `전원 분담 (${splitCount}명)`
@@ -362,7 +362,7 @@ function MyTransfers({
   if (!userMember) {
     return (
       <p className="rounded-xl border border-dashed border-line bg-cream-50/60 px-3 py-4 text-center text-xs text-ink-muted">
-        본인을 먼저 선택해줘
+        본인을 먼저 선택해 주세요
       </p>
     );
   }
@@ -370,7 +370,7 @@ function MyTransfers({
   if (myTransfers.send.length === 0 && myTransfers.receive.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-line bg-cream-50/60 px-3 py-4 text-center text-xs text-ink-muted">
-        보낼/받을 돈 없음 ✨
+        보내거나 받을 금액이 없어요 ✨
       </p>
     );
   }
@@ -380,7 +380,7 @@ function MyTransfers({
       {myTransfers.send.length > 0 && (
         <div className="space-y-1">
           <div className="px-1 text-[11px] font-bold text-red-500">
-            🔻 내가 보낼 돈 ({myTransfers.send.length})
+            🔻 보낼 금액 ({myTransfers.send.length})
           </div>
           {myTransfers.send.map((t, i) => {
             const to = memberById(t.to);
@@ -403,7 +403,7 @@ function MyTransfers({
       {myTransfers.receive.length > 0 && (
         <div className="space-y-1">
           <div className="px-1 text-[11px] font-bold text-green-600">
-            🔺 내가 받을 돈 ({myTransfers.receive.length})
+            🔺 받을 금액 ({myTransfers.receive.length})
           </div>
           {myTransfers.receive.map((t, i) => {
             const from = memberById(t.from);
@@ -411,7 +411,7 @@ function MyTransfers({
               <Card key={`r-${i}`} className="!p-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">
-                    {from?.emoji} <span className="font-bold">{from?.name}</span>한테
+                    {from?.emoji} <span className="font-bold">{from?.name}</span>에게서
                   </span>
                   <span className="ml-auto text-base font-black tabular-nums text-green-600">
                     +{t.amount.toLocaleString()}원

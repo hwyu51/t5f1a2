@@ -12,9 +12,9 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 정하기' },
-  { to: '/shopping', label: '장보기', icon: '🛒', desc: '메뉴 → 식재료 자동 집계' },
-  { to: '/budget', label: '정산', icon: '💰', desc: '지출/N분의1' },
+  { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 선택' },
+  { to: '/shopping', label: '장보기', icon: '🛒', desc: '식재료 자동 집계' },
+  { to: '/budget', label: '정산', icon: '💰', desc: '지출 및 N분의1 정산' },
 ];
 
 type Props = {
@@ -101,7 +101,7 @@ export default function MoreSheet({ open, onClose }: Props) {
                     : 'border border-line bg-cream-50 text-ink-muted hover:border-ink-muted'
                 }`}
               >
-                {isAdmin ? '🔧 관리자 모드 ON · 끄기' : '🔧 관리자 모드'}
+                {isAdmin ? '🔧 관리자 모드 ON · 종료' : '🔧 관리자 모드'}
               </button>
               {isAdmin && (
                 <button

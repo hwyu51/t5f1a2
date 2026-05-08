@@ -124,7 +124,7 @@ export default function ShoppingPage() {
         <h1 className="text-xl font-black text-ink">장보기</h1>
         <p className="mt-1 text-sm text-ink-muted">
           {empty
-            ? '메뉴 정하거나 직접 추가하면 리스트가 만들어져'
+            ? '메뉴를 선택하거나 직접 추가하면 리스트가 만들어져요'
             : `${checkedCount} / ${total} 담음`}
         </p>
       </div>
@@ -139,14 +139,14 @@ export default function ShoppingPage() {
           <Card className="space-y-3 text-center">
             <div className="text-4xl leading-none">🛒</div>
             <div className="text-sm text-ink-muted">
-              <span className="font-bold text-ink">메뉴</span>에서 먹을 거 정하거나 위
-              폼으로 직접 추가
+              <span className="font-bold text-ink">메뉴</span>에서 먹을 메뉴를
+              선택하거나 위 폼에서 직접 추가해 주세요.
             </div>
             <Link
               to="/menus"
               className="mx-auto inline-block rounded-xl bg-orange-500 px-5 py-2 text-sm font-bold text-white shadow-sm active:scale-95"
             >
-              메뉴 정하러 가기
+              메뉴 선택하러 가기
             </Link>
           </Card>
         </Section>
@@ -290,7 +290,7 @@ function AddForm({
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="+ 직접 추가"
+        placeholder="직접 추가할 항목"
         maxLength={20}
         className="min-w-0 flex-1 rounded-md border border-line bg-card px-2 py-1.5 text-sm"
       />

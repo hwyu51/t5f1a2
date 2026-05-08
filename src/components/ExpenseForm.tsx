@@ -114,13 +114,13 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
         </header>
 
         <div className="space-y-3">
-          <Field label="낸 사람">
+          <Field label="결제자">
             <select
               value={payerId}
               onChange={(e) => setPayerId(e.target.value)}
               className="w-full rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm"
             >
-              <option value="">아직 안 정함 (예정)</option>
+              <option value="">미정 (예정 지출)</option>
               {confirmed.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.emoji} {m.name}
