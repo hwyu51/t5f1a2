@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', sans-serif;
+
+  /* 베이지/크림 배경 */
+  --color-cream: #f7f2e7;
+  --color-cream-50: #fbf8f0;
+  --color-cream-100: #f5efdf;
+  --color-cream-200: #ebe2cb;
+
+  /* 오렌지 액센트 (여름 바다 무드) */
+  --color-orange: #e07b3f;
+  --color-orange-50: #fdf3eb;
+  --color-orange-100: #f9dcc4;
+  --color-orange-500: #e07b3f;
+  --color-orange-600: #c5642b;
+  --color-orange-700: #9c4f22;
+
+  /* 브라운 액센트 */
+  --color-brown: #8b5e3c;
+  --color-brown-700: #6b462b;
+
+  /* 네이비 (포인트) */
+  --color-navy: #1f3a5f;
+
+  /* 텍스트 */
+  --color-ink: #2b2418;
+  --color-ink-muted: #7a6a55;
+
+  /* 카드/보더 */
+  --color-card: #ffffff;
+  --color-line: #e8dec8;
+
+  /* 알림 */
+  --color-warn-bg: #fff4e0;
+  --color-warn-border: #f1c486;
+  --color-warn-ink: #8a5a14;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background-color: var(--color-cream);
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+/* 데스크톱에서 모바일 폭으로 가운데 정렬 */
+@media (min-width: 768px) {
+  body {
+    background-color: #efe7d4;
+  }
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
