@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import AddMenuForm from '../components/AddMenuForm';
 import Card from '../components/Card';
-import MenuCard, { type MenuEditPatch } from '../components/MenuCard';
+import MenuCard from '../components/MenuCard';
 import Section from '../components/Section';
 import { MENUS } from '../data/menus';
 import { useAdminMode } from '../hooks/useAdminMode';
@@ -27,11 +27,12 @@ export default function MenusPage() {
   const { menus: customMenus, add, remove, update } = useCustomMenus();
   const { overrides, setOverride } = useMenuOverrides();
   const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Menu | null>(null);
 
   const allMenus = useMemo(() => {
-    const seedMerged = MENUS
-      .filter((m) => !overrides[m.id]?.disabled) // 관리자가 숨긴 시드 제외
-      .map((m) => ({ ...m, ...(overrides[m.id] ?? {}) }));
+    const seedMerged = MENUS.filter((m) => !overrides[m.id]?.disabled).map(
+      (m) => ({ ...m, ...(overrides[m.id] ?? {}) }),
+    );
     return [...seedMerged, ...customMenus];
   }, [customMenus, overrides]);
 
@@ -47,16 +48,44 @@ export default function MenusPage() {
   const isCustom = (id: string) => customMenus.some((c) => c.id === id);
   const totalSelected = selectedIds.length;
 
-  const handleAdd = async (input: Omit<Menu, 'id'>) => {
-    await add(input);
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '메뉴 추가',
-        target: input.name,
-      });
+  const openAdd = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+
+  const openEdit = (menu: Menu) => {
+    setEditing(menu);
+    setFormOpen(true);
+  };
+
+  const handleSubmit = async (input: Omit<Menu, 'id'>) => {
+    if (editing) {
+      if (isCustom(editing.id)) {
+        await update(editing.id, input);
+      } else {
+        // 시드 메뉴: override에 부분 변경 (이름/카테고리/메모/식재료)
+        setOverride(editing.id, input);
+      }
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '메뉴 수정',
+          target: `${editing.name} → ${input.name}`,
+        });
+      }
+    } else {
+      await add(input);
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '메뉴 추가',
+          target: input.name,
+        });
+      }
     }
+    setEditing(null);
   };
 
   const handleRemove = async (menu: Menu) => {
@@ -66,7 +95,6 @@ export default function MenusPage() {
       // 시드 메뉴는 override.disabled로 숨김 (코드 데이터는 보존)
       setOverride(menu.id, { disabled: true });
     }
-    // dangling cleanup
     if (isSelected(menu.id)) {
       void toggle(menu.id);
     }
@@ -76,22 +104,6 @@ export default function MenusPage() {
         actorName: user.name,
         action: '메뉴 삭제',
         target: menu.name,
-      });
-    }
-  };
-
-  const handleEdit = async (menu: Menu, patch: MenuEditPatch) => {
-    if (isCustom(menu.id)) {
-      await update(menu.id, patch);
-    } else {
-      setOverride(menu.id, patch);
-    }
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '메뉴 수정',
-        target: `${menu.name} → ${patch.name ?? menu.name}`,
       });
     }
   };
@@ -116,7 +128,7 @@ export default function MenusPage() {
             </div>
             <button
               type="button"
-              onClick={() => setFormOpen(true)}
+              onClick={openAdd}
               className="rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm active:scale-95"
             >
               + 메뉴 추가
@@ -142,7 +154,7 @@ export default function MenusPage() {
                 isAdmin={isAdmin}
                 canDelete={isCustom(menu.id) || isAdmin}
                 onDelete={() => handleRemove(menu)}
-                onEdit={(patch) => handleEdit(menu, patch)}
+                onEdit={() => openEdit(menu)}
               />
             ))}
           </div>
@@ -151,8 +163,12 @@ export default function MenusPage() {
 
       <AddMenuForm
         open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onAdd={handleAdd}
+        initial={editing}
+        onClose={() => {
+          setFormOpen(false);
+          setEditing(null);
+        }}
+        onSubmit={handleSubmit}
       />
     </div>
   );

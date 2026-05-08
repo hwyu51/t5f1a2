@@ -59,20 +59,6 @@ export const MENUS: Menu[] = [
 
   // === 안주 (4인분 정도) ===
   {
-    id: 'chicken-skewer',
-    name: '닭꼬치 (소금/데리야키)',
-    category: '안주',
-    servings: 4,
-    notes: '냉동 사가도 OK / 혜원이 직접 만들어 얼려와도 OK',
-    ingredients: [
-      { name: '닭다리살',     amount: '500g',  category: '정육' },
-      { name: '대파',         amount: '3대',    category: '채소' },
-      { name: '꼬치 막대',    amount: '1봉',    category: '잡화' },
-      { name: '데리야키소스', amount: '1병',    category: '소스/양념' },
-      { name: '굵은소금',     amount: '약간',   category: '소스/양념' },
-    ],
-  },
-  {
     id: 'dakbokkeumtang',
     name: '닭볶음탕',
     category: '안주',

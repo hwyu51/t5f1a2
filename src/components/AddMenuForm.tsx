@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Ingredient, Menu } from '../types';
 
 const CATEGORIES: Menu['category'][] = ['식사', '안주', '간식'];
@@ -14,8 +14,9 @@ const INGREDIENT_CATEGORIES: Ingredient['category'][] = [
 
 type Props = {
   open: boolean;
+  initial?: Menu | null;
   onClose: () => void;
-  onAdd: (input: Omit<Menu, 'id'>) => Promise<void>;
+  onSubmit: (input: Omit<Menu, 'id'>) => Promise<void>;
 };
 
 type DraftIngredient = {
@@ -26,18 +27,49 @@ type DraftIngredient = {
 
 const EMPTY_ING: DraftIngredient = { name: '', amount: '', category: '정육' };
 
-export default function AddMenuForm({ open, onClose, onAdd }: Props) {
+export default function AddMenuForm({
+  open,
+  initial,
+  onClose,
+  onSubmit,
+}: Props) {
+  const isEdit = Boolean(initial);
   const [name, setName] = useState('');
   const [category, setCategory] = useState<Menu['category']>('식사');
   const [notes, setNotes] = useState('');
-  const [ingredients, setIngredients] = useState<DraftIngredient[]>([{ ...EMPTY_ING }]);
+  const [ingredients, setIngredients] = useState<DraftIngredient[]>([
+    { ...EMPTY_ING },
+  ]);
 
-  const reset = () => {
-    setName('');
-    setCategory('식사');
-    setNotes('');
-    setIngredients([{ ...EMPTY_ING }]);
-  };
+  useEffect(() => {
+    if (!open) return;
+    if (initial) {
+      setName(initial.name);
+      setCategory(initial.category);
+      setNotes(initial.notes ?? '');
+      setIngredients(
+        initial.ingredients.length > 0
+          ? initial.ingredients.map((i) => ({
+              name: i.name,
+              amount: i.amount,
+              category: i.category,
+            }))
+          : [{ ...EMPTY_ING }],
+      );
+    } else {
+      setName('');
+      setCategory('식사');
+      setNotes('');
+      setIngredients([{ ...EMPTY_ING }]);
+    }
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open, initial]);
+
+  if (!open) return null;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,17 +83,14 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
           category: i.category,
         }),
       );
-    await onAdd({
+    await onSubmit({
       name: name.trim(),
       category,
       ...(notes.trim() ? { notes: notes.trim() } : {}),
       ingredients: cleaned,
     });
-    reset();
     onClose();
   };
-
-  if (!open) return null;
 
   return (
     <div
@@ -74,7 +103,9 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
         className="max-h-[90vh] w-full max-w-[28rem] overflow-y-auto rounded-t-3xl bg-card p-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] shadow-xl sm:rounded-3xl"
       >
         <header className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-bold text-ink">메뉴 추가</h2>
+          <h2 className="text-base font-bold text-ink">
+            {isEdit ? '메뉴 수정' : '메뉴 추가'}
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -235,9 +266,10 @@ export default function AddMenuForm({ open, onClose, onAdd }: Props) {
           </button>
           <button
             type="submit"
-            className="flex-1 rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-white shadow-sm"
+            disabled={!name.trim()}
+            className="flex-1 rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-40"
           >
-            추가
+            {isEdit ? '저장' : '추가'}
           </button>
         </div>
       </form>
