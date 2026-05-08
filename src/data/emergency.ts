@@ -1,4 +1,10 @@
-export const EMERGENCY = {
+export type EmergencyContact = {
+  name: string;
+  phone: string;
+  note?: string;
+};
+
+export const EMERGENCY: { external: EmergencyContact[] } = {
   external: [
     { name: '대천 해녀펜션', phone: '010-2371-4287', note: '대표 김만종, 카톡 @해라사이' },
     { name: '풍미꽃게장게국지', phone: '041-934-6442' },
@@ -7,4 +13,4 @@ export const EMERGENCY = {
     { name: '보령시축제관광재단', phone: '041-930-0891' },
     // TODO: 인근 병원/약국, 보령경찰서 → 관리자 모드에서 추가 가능
   ],
-} as const;
+};
