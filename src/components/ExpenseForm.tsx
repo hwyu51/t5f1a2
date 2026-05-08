@@ -69,15 +69,19 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
     e.preventDefault();
     if (!isValid) return;
 
-    onSubmit({
+    // Firestore는 undefined를 거부하므로 splitMode='subset'일 때만 participantIds 키 포함
+    const data: Omit<Expense, 'id' | 'createdAt'> = {
       payerId,
       amount: numAmount,
       memo: memo.trim(),
       splitMode,
-      participantIds: splitMode === 'subset' ? participantIds : undefined,
       date,
       pending,
-    });
+    };
+    if (splitMode === 'subset') {
+      data.participantIds = participantIds;
+    }
+    onSubmit(data);
     onClose();
   };
 
