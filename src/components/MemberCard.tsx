@@ -16,8 +16,11 @@ export default function MemberCard({ member, isSelf = false }: Props) {
             : 'border-dashed border-line bg-cream-50/60'
       }`}
     >
-      <div className="text-2xl leading-none">
+      <div className="relative text-2xl leading-none">
         {member.confirmed ? (member.emoji ?? '🙂') : '❓'}
+        {member.isDriver && (
+          <span className="absolute -right-2 -top-1 text-sm leading-none">🚗</span>
+        )}
       </div>
       <div className="text-sm font-bold text-ink">{member.name}</div>
       <div className="text-[10px] font-bold tracking-widest text-ink-muted">
