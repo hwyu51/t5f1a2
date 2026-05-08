@@ -12,12 +12,12 @@ const APPS: Array<{ app: NavApp; label: string; bg: string }> = [
 ];
 
 export default function NavLinks({ target, className = '' }: Props) {
-  const disabled = !target.lat || !target.lng;
+  const disabled = !target.lat && !target.lng && !target.address;
 
   if (disabled) {
     return (
       <div className={`text-xs italic text-ink-muted ${className}`}>
-        좌표 미등록 — 관리자 모드에서 입력 필요
+        위치 아직 안 정함
       </div>
     );
   }

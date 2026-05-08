@@ -44,7 +44,7 @@ export default function PlaceMini({ place, selected, onSelect, onClear }: Props)
             onClick={onSelect}
             className="shrink-0 rounded-lg border border-orange-500 px-3 py-2 text-xs font-bold text-orange-600 hover:bg-orange-50"
           >
-            이걸로
+            여기로
           </button>
         )}
         {onClear && selected && (
@@ -53,7 +53,7 @@ export default function PlaceMini({ place, selected, onSelect, onClear }: Props)
             onClick={onClear}
             className="shrink-0 rounded-lg border border-line px-3 py-2 text-xs text-ink-muted hover:bg-cream-100"
           >
-            해제
+            취소
           </button>
         )}
       </div>

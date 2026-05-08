@@ -126,7 +126,7 @@ export default function ScheduleCard({
               </span>
             </span>
             <span className="text-[11px] font-medium text-ink-muted">
-              후보 {options.length} ›
+              {options.length}곳 중 골라 ›
             </span>
           </button>
         )}

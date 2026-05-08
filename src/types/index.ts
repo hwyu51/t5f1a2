@@ -3,7 +3,6 @@ export type Member = {
   name: string;
   emoji?: string;
   isDriver?: boolean;
-  carId?: 'car1' | 'car2';
   confirmed: boolean;
 };
 
@@ -93,11 +92,15 @@ export type Expense = {
   payerId: string;
   amount: number;
   memo: string;
-  type: '공통' | '차량1' | '차량2';
+  // 분담 방식
+  // - 'all': 모든 멤버가 N분의1 (펜션비, 렌트비, 장보기 등)
+  // - 'subset': participantIds에 적힌 사람만 N분의1 (머드축제 입장권, 스카이바이크 등)
+  splitMode: 'all' | 'subset';
+  participantIds?: string[]; // splitMode='subset'일 때만
   date: string;
   createdAt: number;
   receipts?: Receipt[];
-  pending?: boolean;
+  pending?: boolean; // 예정 지출 (정산 대상에서 제외)
 };
 
 export type PlaceNote = {

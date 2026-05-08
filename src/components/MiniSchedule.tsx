@@ -38,7 +38,7 @@ export default function MiniSchedule() {
           to="/schedule"
           className="text-xs font-medium text-orange-600 hover:underline"
         >
-          전체 보기 ›
+          다 보기 ›
         </Link>
       </header>
 

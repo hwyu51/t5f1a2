@@ -21,8 +21,8 @@ export default function MemberCard({ member, isSelf = false }: Props) {
       </div>
       <div className="text-sm font-bold text-ink">{member.name}</div>
       <div className="text-[10px] text-ink-muted">
-        {member.isDriver ? '🚗 운전' : member.confirmed ? '확정' : '미확정'}
-        {isSelf && ' · 본인'}
+        {member.isDriver ? '🚗 운전' : member.confirmed ? '확정' : '미정'}
+        {isSelf && ' · 나'}
       </div>
     </div>
   );

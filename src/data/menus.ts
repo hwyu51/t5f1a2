@@ -24,10 +24,10 @@ export const MENUS: Menu[] = [
     name: '훈제 통삼겹 (훈제박스)',
     category: '식사',
     servings: 8,
-    notes: '훈제박스 1시간 → 뽑은 상태로 머드 후 복귀하면 식감 등',
+    notes: '훈제박스 1시간 돌려놓고 머드 갔다 오면 딱 익어 있음',
     ingredients: [
       { name: '통삼겹', amount: '2kg', category: '정육' },
-      { name: '훈제박스', amount: '1개', category: '잡화', note: '⚠️ 일회용 구매 필요' },
+      { name: '훈제박스', amount: '1개', category: '잡화', note: '⚠️ 일회용 사야 됨' },
       { name: '훈제칩', amount: '1봉', category: '잡화', optional: true },
     ],
   },
@@ -36,7 +36,7 @@ export const MENUS: Menu[] = [
     name: '통오겹 오븐구이 (지빈 담당)',
     category: '식사',
     servings: 8,
-    notes: '고소 단지 스타일. 펜션 오븐 사용 가능 여부 확인 필요',
+    notes: '지빈 시그니처. 펜션 오븐 쓸 수 있는지 확인 필요',
     ingredients: [
       { name: '통오겹', amount: '2kg', category: '정육' },
       { name: '허브솔트', amount: '1통', category: '소스/양념' },
@@ -73,10 +73,10 @@ export const MENUS: Menu[] = [
   },
   {
     id: 'dakbokkeumtang',
-    name: '닭볶음탕 / 안닭',
+    name: '닭볶음탕',
     category: '식사',
     servings: 8,
-    notes: '둘 중 하나 (선택). 안주로 좋음',
+    notes: '안주로도 굿',
     ingredients: [
       { name: '닭(볶음탕용)', amount: '2마리', category: '정육' },
       { name: '감자', amount: '5개', category: '채소' },
@@ -97,7 +97,7 @@ export const MENUS: Menu[] = [
       { name: '김밥김', amount: '2봉', category: '잡화' },
       { name: '밥', amount: '5인분', category: '잡화' },
       { name: '단무지', amount: '2봉', category: '채소' },
-      { name: '맛이', amount: '2팩', category: '정육' },
+      { name: '햄', amount: '2팩', category: '정육' },
       { name: '계란', amount: '10개', category: '잡화' },
       { name: '시금치', amount: '1단', category: '채소' },
       { name: '참기름', amount: '1병', category: '소스/양념' },
@@ -108,7 +108,7 @@ export const MENUS: Menu[] = [
     name: '오뎅탕',
     category: '안주',
     servings: 8,
-    notes: '국물 시원함. 술안주로 굿',
+    notes: '국물 시원. 술안주로 굿',
     ingredients: [
       { name: '모듬어묵', amount: '2봉', category: '정육' },
       { name: '무', amount: '1개', category: '채소' },
@@ -121,8 +121,7 @@ export const MENUS: Menu[] = [
     name: '이자카야 꼬치 (혜원 사전 준비)',
     category: '안주',
     servings: 8,
-    notes: '냉동으로 만들어 가져오기. 종류별로 다양',
-    ingredients: [{ name: '꼬치 재료 (혜원 자체 준비)', amount: '1세트', category: '정육' }],
+    notes: '미리 냉동으로 만들어 가져옴. 종류 다양',
+    ingredients: [{ name: '꼬치 (혜원이 직접)', amount: '1세트', category: '정육' }],
   },
-  // TODO: 우슈 구이, 안조 등 추가 메뉴 후보 (지빈 통오겹과 별개)
 ];
