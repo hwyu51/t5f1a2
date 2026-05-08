@@ -3,7 +3,6 @@ import Card from '../components/Card';
 import DDayBanner from '../components/DDayBanner';
 import MemberCard from '../components/MemberCard';
 import Section from '../components/Section';
-import { LODGING } from '../data/lodging';
 import { MEMBERS } from '../data/members';
 import { PLACES } from '../data/places';
 import { TRIP } from '../data/trip';
@@ -15,19 +14,15 @@ const ALERTS = [
   { icon: '⚾', title: '야구 유니폼', desc: '바닷가 노상 드레스코드 (혜원·지환이 보유, 빌리세요)' },
   { icon: '👕', title: '버릴 옷 + 내복', desc: '머드축제용. 위아래 + 갈아입을 비닐' },
   { icon: '🩴', title: '크록스 or 슬리퍼', desc: '운동화 X. 머드축제장에서 신을 신발' },
-  { icon: '👙', title: '수영복', desc: '대천해수욕장 샤워 + 머드 씻기' },
 ];
 
 const QUICK_LINKS = [
   { to: '/schedule', label: '일정', icon: '📅' },
-  { to: '/route', label: '경로', icon: '🗺️' },
   { to: '/lodging', label: '숙소', icon: '🏠' },
   { to: '/menus', label: '메뉴', icon: '🍖' },
   { to: '/shopping', label: '장보기', icon: '🛒' },
   { to: '/packing', label: '준비물', icon: '🎒' },
   { to: '/cars', label: '차량', icon: '🚗' },
-  { to: '/budget', label: '정산', icon: '💰' },
-  { to: '/emergency', label: '비상', icon: '🆘' },
 ];
 
 export default function Home() {
@@ -124,22 +119,6 @@ export default function Home() {
             </li>
           ))}
         </ul>
-      </Section>
-
-      {/* 숙소 한 줄 */}
-      <Section>
-        <Link to="/lodging">
-          <Card className="flex items-center justify-between hover:border-orange-300">
-            <div>
-              <div className="text-xs text-ink-muted">숙소</div>
-              <div className="mt-0.5 text-sm font-bold text-ink">{LODGING.name}</div>
-              <div className="mt-0.5 text-xs text-ink-muted">
-                체크인 {LODGING.checkIn} · 체크아웃 {LODGING.checkOut}
-              </div>
-            </div>
-            <div className="text-ink-muted">›</div>
-          </Card>
-        </Link>
       </Section>
     </div>
   );

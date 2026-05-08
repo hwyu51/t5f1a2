@@ -32,8 +32,7 @@ export const PACKING: PackingItem[] = [
     type: '개인',
     /* 운동화 X */
   },
-  { id: 'p24', name: '수영복', type: '개인' },
-  { id: 'p25', name: '비치타올', type: '개인' },
+  { id: 'p25', name: '큰 수건 (머드 후 닦기)', type: '개인' },
   { id: 'p26', name: '여벌 옷 (머드 후 갈아입을)', type: '개인' },
   { id: 'p27', name: '세면도구', type: '개인' },
   { id: 'p28', name: '개인 약간', type: '개인' },
