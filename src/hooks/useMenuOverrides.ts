@@ -3,7 +3,9 @@ import type { Menu } from '../types';
 
 const PATH = 'state/menuOverrides';
 
-export type MenuOverride = Partial<Pick<Menu, 'name' | 'category' | 'notes'>>;
+export type MenuOverride = Partial<Pick<Menu, 'name' | 'category' | 'notes'>> & {
+  disabled?: boolean; // 시드 메뉴 숨김 처리 (사용자 화면에서 안 보이게)
+};
 type State = { overrides: Record<string, MenuOverride> };
 
 const DEFAULT: State = { overrides: {} };

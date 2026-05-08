@@ -29,7 +29,9 @@ export default function MenusPage() {
   const [formOpen, setFormOpen] = useState(false);
 
   const allMenus = useMemo(() => {
-    const seedMerged = MENUS.map((m) => ({ ...m, ...(overrides[m.id] ?? {}) }));
+    const seedMerged = MENUS
+      .filter((m) => !overrides[m.id]?.disabled) // 관리자가 숨긴 시드 제외
+      .map((m) => ({ ...m, ...(overrides[m.id] ?? {}) }));
     return [...seedMerged, ...customMenus];
   }, [customMenus, overrides]);
 
@@ -58,8 +60,13 @@ export default function MenusPage() {
   };
 
   const handleRemove = async (menu: Menu) => {
-    await remove(menu);
-    // dangling cleanup: 삭제된 메뉴가 selectedIds에 있으면 제거
+    if (isCustom(menu.id)) {
+      await remove(menu);
+    } else {
+      // 시드 메뉴는 override.disabled로 숨김 (코드 데이터는 보존)
+      setOverride(menu.id, { disabled: true });
+    }
+    // dangling cleanup
     if (isSelected(menu.id)) {
       void toggle(menu.id);
     }
@@ -133,7 +140,7 @@ export default function MenusPage() {
                 selected={isSelected(menu.id)}
                 onToggle={toggle}
                 isAdmin={isAdmin}
-                canDelete={isCustom(menu.id)}
+                canDelete={isCustom(menu.id) || isAdmin}
                 onDelete={() => handleRemove(menu)}
                 onEdit={(patch) => handleEdit(menu, patch)}
               />

@@ -8,12 +8,22 @@ export type NavTarget = {
 export function isMobile(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
-  if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;
-  // iPadOS 13+ 는 UA를 Macintosh로 위장 — maxTouchPoints로 감지
+  // 모바일 일반 (Mobi 추가 — Firefox Mobile, 일부 안드로이드)
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(ua)) return true;
+  // iPadOS 13+ Macintosh 위장
   if (
     ua.includes('Macintosh') &&
     typeof navigator.maxTouchPoints === 'number' &&
     navigator.maxTouchPoints > 1
+  ) {
+    return true;
+  }
+  // 마지막 fallback: 터치 가능 + 좁은 화면
+  if (
+    typeof navigator.maxTouchPoints === 'number' &&
+    navigator.maxTouchPoints > 0 &&
+    typeof window !== 'undefined' &&
+    window.innerWidth <= 768
   ) {
     return true;
   }

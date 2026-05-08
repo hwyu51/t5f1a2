@@ -28,13 +28,12 @@ export function calculateBalances(expenses: Expense[], members: Member[]): Balan
   }
 
   for (const exp of expenses) {
-    if (exp.pending) continue;
     if (exp.amount <= 0) continue;
+    if (!exp.payerId) continue;
+    // pending도 정산 포함 (결제자 정해진 예정 지출은 미리 분담)
 
-    if (exp.payerId) {
-      const payerBal = balanceMap.get(exp.payerId);
-      if (payerBal) payerBal.paid += exp.amount;
-    }
+    const payerBal = balanceMap.get(exp.payerId);
+    if (payerBal) payerBal.paid += exp.amount;
 
     const participants =
       exp.splitMode === 'subset'
@@ -75,7 +74,8 @@ export function calculateTransfers(
   const pairs = new Map<string, number>(); // `from|to` → amount
 
   for (const exp of expenses) {
-    if (exp.pending || !exp.payerId || exp.amount <= 0) continue;
+    if (!exp.payerId || exp.amount <= 0) continue;
+    // pending도 포함 — 결제자 정해진 예정 지출은 정산
     const participants =
       exp.splitMode === 'subset'
         ? exp.participantIds ?? []
