@@ -5,20 +5,30 @@ import ExpenseForm from '../components/ExpenseForm';
 import Section from '../components/Section';
 import Spinner from '../components/Spinner';
 import { SEED_EXPENSES } from '../data/initialExpenses';
-import { db } from '../lib/firebase';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useExpenses } from '../hooks/useExpenses';
 import { useMembers } from '../hooks/useMembers';
+import { db } from '../lib/firebase';
 import { logAudit } from '../utils/audit';
-import { calculateBalances, calculateTransfers } from '../utils/settlement';
-import type { Expense } from '../types';
+import {
+  calculateBalances,
+  calculateTransfers,
+  groupTransfersByTo,
+} from '../utils/settlement';
+import type { Expense, Member } from '../types';
+
+type Tab = 'mine' | 'all';
 
 export default function BudgetPage() {
   const { user } = useCurrentUser();
   const { members } = useMembers();
   const { expenses, ready, add, update, remove } = useExpenses();
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Expense | null>(null);
+  const [tab, setTab] = useState<Tab>('mine');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // 첫 진입 시 시드 지출(펜션비/그릴비) 한 번만 등록 — 멱등 (state/seedExpensesInit 플래그)
+  // 첫 진입 시 시드 지출 한 번만 등록 (멱등 플래그)
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
@@ -36,12 +46,10 @@ export default function BudgetPage() {
       cancelled = true;
     };
   }, [ready]);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Expense | null>(null);
 
+  // 총 지출에 예정 포함, 그 중 예정 별도 안내
   const totals = useMemo(() => {
-    const settled = expenses.filter((e) => !e.pending);
-    const total = settled.reduce((s, e) => s + e.amount, 0);
+    const total = expenses.reduce((s, e) => s + e.amount, 0);
     const pendingTotal = expenses
       .filter((e) => e.pending)
       .reduce((s, e) => s + e.amount, 0);
@@ -50,11 +58,21 @@ export default function BudgetPage() {
 
   const balances = useMemo(
     () => calculateBalances(expenses, members),
-    [expenses],
+    [expenses, members],
   );
   const transfers = useMemo(() => calculateTransfers(balances), [balances]);
+  const grouped = useMemo(() => groupTransfersByTo(transfers), [transfers]);
 
-  const memberById = (id: string) => members.find((m) => m.id === id);
+  const myTransfers = useMemo(() => {
+    if (!user) return { send: [], receive: [] };
+    return {
+      send: transfers.filter((t) => t.from === user.id),
+      receive: transfers.filter((t) => t.to === user.id),
+    };
+  }, [transfers, user]);
+
+  const memberById = (id: string): Member | undefined =>
+    members.find((m) => m.id === id);
 
   const handleSubmit = async (input: Omit<Expense, 'id' | 'createdAt'>) => {
     if (editing) {
@@ -103,6 +121,8 @@ export default function BudgetPage() {
     setFormOpen(true);
   };
 
+  const myBalance = user ? balances.find((b) => b.memberId === user.id) : null;
+
   return (
     <div className="space-y-4 pb-4">
       <div className="px-4 pt-5">
@@ -116,89 +136,82 @@ export default function BudgetPage() {
       <Section>
         <Card className="!p-4">
           <div className="flex items-baseline justify-between">
-            <span className="text-xs text-ink-muted">총 지출 (정산 대상)</span>
+            <span className="text-xs text-ink-muted">총 지출</span>
             <span className="text-2xl font-black tabular-nums text-orange-600">
               {totals.total.toLocaleString()}원
             </span>
           </div>
           {totals.pendingTotal > 0 && (
             <div className="mt-1 flex items-baseline justify-between text-xs text-ink-muted">
-              <span>예정 지출 (제외)</span>
+              <span>이 중 예정</span>
               <span className="tabular-nums">
                 {totals.pendingTotal.toLocaleString()}원
+              </span>
+            </div>
+          )}
+          {myBalance && (
+            <div className="mt-3 flex items-baseline justify-between border-t border-line pt-3 text-sm">
+              <span className="text-ink-muted">
+                내 잔액 ({user?.name})
+                <span className="ml-1.5 text-[11px] text-ink-muted">
+                  냄 {Math.round(myBalance.paid).toLocaleString()} · 몫{' '}
+                  {Math.round(myBalance.share).toLocaleString()}
+                </span>
+              </span>
+              <span
+                className={`font-bold tabular-nums ${
+                  myBalance.net > 0
+                    ? 'text-green-600'
+                    : myBalance.net < 0
+                      ? 'text-red-500'
+                      : 'text-ink-muted'
+                }`}
+              >
+                {myBalance.net > 0 ? '+' : ''}
+                {myBalance.net.toLocaleString()}원
               </span>
             </div>
           )}
         </Card>
       </Section>
 
-      {/* 정산표 */}
+      {/* 정산표 — 탭 */}
       {transfers.length > 0 && (
         <Section title="💸 정산">
-          <div className="space-y-1.5">
-            {transfers.map((t, i) => {
-              const from = memberById(t.from);
-              const to = memberById(t.to);
-              return (
-                <Card key={i} className="!p-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-ink">
-                      {from?.emoji} {from?.name}
-                    </span>
-                    <span className="text-ink-muted">→</span>
-                    <span className="text-sm font-bold text-ink">
-                      {to?.emoji} {to?.name}
-                    </span>
-                    <span className="ml-auto text-base font-black tabular-nums text-orange-600">
-                      {t.amount.toLocaleString()}원
-                    </span>
-                  </div>
-                </Card>
-              );
-            })}
+          <div className="mb-2 grid grid-cols-2 gap-1 rounded-lg bg-cream-100 p-0.5">
+            <button
+              type="button"
+              onClick={() => setTab('mine')}
+              className={`rounded-md py-1.5 text-xs font-bold transition ${
+                tab === 'mine'
+                  ? 'bg-card text-orange-600 shadow-sm'
+                  : 'text-ink-muted'
+              }`}
+            >
+              내 정산
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('all')}
+              className={`rounded-md py-1.5 text-xs font-bold transition ${
+                tab === 'all'
+                  ? 'bg-card text-orange-600 shadow-sm'
+                  : 'text-ink-muted'
+              }`}
+            >
+              전체
+            </button>
           </div>
-        </Section>
-      )}
 
-      {/* 멤버별 잔액 */}
-      {balances.length > 0 && (
-        <Section title="📊 1인 잔액">
-          <Card className="!p-3">
-            <ul className="space-y-1.5">
-              {balances.map((b) => {
-                const m = memberById(b.memberId);
-                if (!m) return null;
-                const isCreditor = b.net > 0;
-                const isDebtor = b.net < 0;
-                return (
-                  <li
-                    key={b.memberId}
-                    className="flex items-baseline justify-between text-sm"
-                  >
-                    <span>
-                      {m.emoji} <span className="font-bold">{m.name}</span>
-                      <span className="ml-2 text-[11px] text-ink-muted tabular-nums">
-                        냄 {Math.round(b.paid).toLocaleString()} · 몫{' '}
-                        {Math.round(b.share).toLocaleString()}
-                      </span>
-                    </span>
-                    <span
-                      className={`font-bold tabular-nums ${
-                        isCreditor
-                          ? 'text-green-600'
-                          : isDebtor
-                            ? 'text-red-500'
-                            : 'text-ink-muted'
-                      }`}
-                    >
-                      {isCreditor ? '+' : ''}
-                      {b.net.toLocaleString()}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+          {tab === 'mine' ? (
+            <MyTransfers
+              myTransfers={myTransfers}
+              userMember={user ? memberById(user.id) : undefined}
+              memberById={memberById}
+            />
+          ) : (
+            <AllTransfers grouped={grouped} memberById={memberById} />
+          )}
         </Section>
       )}
 
@@ -216,16 +229,29 @@ export default function BudgetPage() {
           ) : (
             expenses.map((e) => {
               const payer = e.payerId ? memberById(e.payerId) : null;
+              const isExpanded = expandedId === e.id;
+              const participants = e.participantIds
+                ?.map(memberById)
+                .filter((m): m is Member => Boolean(m));
+              const splitCount =
+                e.splitMode === 'all'
+                  ? members.filter((m) => m.confirmed).length
+                  : e.participantIds?.length ?? 0;
+              const perPerson = splitCount > 0 ? Math.round(e.amount / splitCount) : 0;
               return (
                 <Card key={e.id} className="!p-3">
                   <button
                     type="button"
-                    onClick={() => openEdit(e)}
+                    onClick={() => setExpandedId(isExpanded ? null : e.id)}
                     className="flex w-full items-start gap-3 text-left"
                   >
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-1.5">
-                        <span className="truncate text-sm font-bold text-ink">
+                        <span
+                          className={`text-sm font-bold text-ink ${
+                            isExpanded ? '' : 'truncate'
+                          }`}
+                        >
                           {e.memo}
                         </span>
                         {e.pending && (
@@ -238,7 +264,7 @@ export default function BudgetPage() {
                         {payer ? `${payer.emoji} ${payer.name}` : '낸 사람 미정'}
                         {' · '}
                         {e.splitMode === 'all'
-                          ? '전원 분담'
+                          ? `전원 분담 (${splitCount}명)`
                           : `${e.participantIds?.length ?? 0}명 분담`}
                         {' · '}
                         {e.date.slice(5)}
@@ -248,6 +274,28 @@ export default function BudgetPage() {
                       {e.amount.toLocaleString()}원
                     </span>
                   </button>
+
+                  {isExpanded && (
+                    <div className="mt-2 space-y-1.5 border-t border-line pt-2 text-[11px] text-ink-muted">
+                      <div className="flex items-baseline justify-between">
+                        <span>1인당</span>
+                        <span className="tabular-nums">
+                          {perPerson.toLocaleString()}원
+                        </span>
+                      </div>
+                      {e.splitMode === 'subset' && participants && (
+                        <div>
+                          <span>참여자 ({participants.length}): </span>
+                          <span className="text-ink">
+                            {participants
+                              .map((m) => `${m.emoji} ${m.name}`)
+                              .join(', ')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="mt-2 flex justify-end gap-2 border-t border-line pt-2">
                     <button
                       type="button"
@@ -275,15 +323,16 @@ export default function BudgetPage() {
         </div>
       </Section>
 
-      {/* 플로팅 + 버튼 */}
-      <button
-        type="button"
-        onClick={openAdd}
-        className="fixed bottom-24 left-1/2 z-30 -translate-x-1/2 rounded-full bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg active:scale-95"
-        style={{ marginLeft: '6rem' }}
-      >
-        + 지출 추가
-      </button>
+      {/* 지출 추가 — 인라인 (겹침 방지) */}
+      <Section>
+        <button
+          type="button"
+          onClick={openAdd}
+          className="w-full rounded-2xl bg-orange-500 py-3 text-sm font-bold text-white shadow-md active:scale-[0.98]"
+        >
+          + 지출 추가
+        </button>
+      </Section>
 
       <ExpenseForm
         open={formOpen}
@@ -294,6 +343,130 @@ export default function BudgetPage() {
         }}
         onSubmit={handleSubmit}
       />
+    </div>
+  );
+}
+
+function MyTransfers({
+  myTransfers,
+  userMember,
+  memberById,
+}: {
+  myTransfers: { send: { from: string; to: string; amount: number }[]; receive: { from: string; to: string; amount: number }[] };
+  userMember?: Member;
+  memberById: (id: string) => Member | undefined;
+}) {
+  if (!userMember) {
+    return (
+      <p className="rounded-xl border border-dashed border-line bg-cream-50/60 px-3 py-4 text-center text-xs text-ink-muted">
+        본인을 먼저 선택해줘
+      </p>
+    );
+  }
+
+  if (myTransfers.send.length === 0 && myTransfers.receive.length === 0) {
+    return (
+      <p className="rounded-xl border border-dashed border-line bg-cream-50/60 px-3 py-4 text-center text-xs text-ink-muted">
+        보낼/받을 돈 없음 ✨
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {myTransfers.send.length > 0 && (
+        <div className="space-y-1">
+          <div className="px-1 text-[11px] font-bold text-red-500">
+            🔻 내가 보낼 돈 ({myTransfers.send.length})
+          </div>
+          {myTransfers.send.map((t, i) => {
+            const to = memberById(t.to);
+            return (
+              <Card key={`s-${i}`} className="!p-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">
+                    {to?.emoji} <span className="font-bold">{to?.name}</span>에게
+                  </span>
+                  <span className="ml-auto text-base font-black tabular-nums text-red-500">
+                    -{t.amount.toLocaleString()}원
+                  </span>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {myTransfers.receive.length > 0 && (
+        <div className="space-y-1">
+          <div className="px-1 text-[11px] font-bold text-green-600">
+            🔺 내가 받을 돈 ({myTransfers.receive.length})
+          </div>
+          {myTransfers.receive.map((t, i) => {
+            const from = memberById(t.from);
+            return (
+              <Card key={`r-${i}`} className="!p-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">
+                    {from?.emoji} <span className="font-bold">{from?.name}</span>한테
+                  </span>
+                  <span className="ml-auto text-base font-black tabular-nums text-green-600">
+                    +{t.amount.toLocaleString()}원
+                  </span>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AllTransfers({
+  grouped,
+  memberById,
+}: {
+  grouped: ReturnType<typeof groupTransfersByTo>;
+  memberById: (id: string) => Member | undefined;
+}) {
+  return (
+    <div className="space-y-1.5">
+      {grouped.map((g) => {
+        const to = memberById(g.toId);
+        return (
+          <Card key={g.toId} className="!p-3">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm">
+                <span className="font-bold text-ink">
+                  {to?.emoji} {to?.name}
+                </span>
+                <span className="ml-1 text-[11px] text-ink-muted">
+                  {g.fromList.length}명에게서
+                </span>
+              </span>
+              <span className="text-base font-black tabular-nums text-orange-600">
+                {g.total.toLocaleString()}원
+              </span>
+            </div>
+            <ul className="mt-2 space-y-0.5 border-t border-line pt-2 text-[11px] text-ink-muted">
+              {g.fromList.map((f, i) => {
+                const from = memberById(f.fromId);
+                return (
+                  <li key={i} className="flex items-baseline justify-between">
+                    <span>
+                      {from?.emoji} {from?.name}
+                    </span>
+                    <span className="tabular-nums">
+                      {f.amount.toLocaleString()}원
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        );
+      })}
     </div>
   );
 }

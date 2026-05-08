@@ -13,6 +13,26 @@ export type Transfer = {
   amount: number;
 };
 
+export type GroupedTransfer = {
+  toId: string;
+  fromList: Array<{ fromId: string; amount: number }>;
+  total: number;
+};
+
+/**
+ * 같은 받는 사람끼리 묶음. 카드 N개 → 받는 사람 M개로 압축.
+ */
+export function groupTransfersByTo(transfers: Transfer[]): GroupedTransfer[] {
+  const map = new Map<string, GroupedTransfer>();
+  for (const t of transfers) {
+    const g = map.get(t.to) ?? { toId: t.to, fromList: [], total: 0 };
+    g.fromList.push({ fromId: t.from, amount: t.amount });
+    g.total += t.amount;
+    map.set(t.to, g);
+  }
+  return Array.from(map.values()).sort((a, b) => b.total - a.total);
+}
+
 /**
  * 멤버별 잔액 계산.
  * - pending=true 지출은 제외
