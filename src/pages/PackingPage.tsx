@@ -131,9 +131,7 @@ export default function PackingPage() {
             />
           ))}
         </div>
-        {isAdmin && (
-          <AddItemForm type="공용" members={members} onAdd={handleAdd} />
-        )}
+        <AddItemForm type="공용" members={members} onAdd={handleAdd} />
       </Section>
 
       <Section title={`🎒 개인 (${groups.personal.length})`}>
@@ -152,9 +150,7 @@ export default function PackingPage() {
             />
           ))}
         </div>
-        {isAdmin && (
-          <AddItemForm type="개인" members={members} onAdd={handleAdd} />
-        )}
+        <AddItemForm type="개인" members={members} onAdd={handleAdd} />
       </Section>
     </div>
   );

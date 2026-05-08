@@ -72,20 +72,16 @@ test.describe('기본 흐름', () => {
     await page.goto('/');
     await page.getByRole('button', { name: /지환/ }).first().click();
 
-    // 비번 prompt 핸들링
-    page.on('dialog', (dialog) => {
-      if (dialog.type() === 'prompt') {
-        void dialog.accept('0501');
-      } else {
-        void dialog.dismiss();
-      }
-    });
-
-    // 더보기 → 관리자 모드 토글
+    // 더보기 → 관리자 모드 토글 → 비번 모달
     await page.getByRole('button', { name: /더보기/ }).click();
     await page.getByRole('button', { name: /관리자 모드/ }).click();
 
-    // 관리자 배너 표시 확인 (sticky 상단)
+    // 비번 모달의 password input에 '0501' 입력 후 확인
+    await page.getByRole('heading', { name: /관리자 비번/ }).waitFor();
+    await page.locator('input[type="password"]').fill('0501');
+    await page.getByRole('button', { name: '확인' }).click();
+
+    // 관리자 배너 표시 확인
     await expect(page.getByText(/관리자 모드 ON/)).toBeVisible();
   });
 });
