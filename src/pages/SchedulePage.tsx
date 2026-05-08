@@ -19,7 +19,7 @@ export default function SchedulePage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">일정</h1>
         <p className="mt-1 text-sm text-ink-muted">
@@ -41,20 +41,23 @@ export default function SchedulePage() {
               }`}
             >
               {label}
-              <span className="ml-1 text-[10px] font-medium opacity-70">{date.slice(5)}</span>
+              <span className="ml-1 text-[10px] font-medium opacity-70">
+                {date.slice(5)}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="space-y-3 px-4">
-        {items.map((item) => (
+      <div className="px-4 pb-2">
+        {items.map((item, idx) => (
           <ScheduleCard
             key={item.id}
             item={item}
             chosenPlaceId={choices[item.id]}
             onChoose={(placeId) => choose(item.id, placeId)}
             onClear={() => clearChoice(item.id)}
+            isLast={idx === items.length - 1}
           />
         ))}
       </div>
