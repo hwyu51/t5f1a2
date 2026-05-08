@@ -8,12 +8,7 @@ export const PACKING: PackingItem[] = [
   { id: 'p04', name: '아이스박스', type: '공용' },
   { id: 'p05', name: '블루투스 스피커', type: '공용', assigneeId: 'jibin' },
   { id: 'p06', name: '카바나 위스키', type: '공용', assigneeId: 'jihwan' },
-  { id: 'p07', name: '쓰레기봉투', type: '공용' },
   { id: 'p08', name: '물티슈/키친타월', type: '공용' },
-  { id: 'p09', name: '종이컵/종이접시', type: '공용' },
-  { id: 'p10', name: '나무젓가락', type: '공용' },
-  { id: 'p11', name: '숯/번개탄 (펜션 그릴 따로 쓸 때)', type: '공용' },
-  { id: 'p12', name: '토치/라이터', type: '공용' },
   { id: 'p13', name: '호일 (꽃게 호일구이용)', type: '공용' },
   { id: 'p14', name: '휴지심 (카바나용)', type: '공용' },
 

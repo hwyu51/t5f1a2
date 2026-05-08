@@ -58,11 +58,16 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
     );
   };
 
+  const numAmount = Number(amountStr.replace(/,/g, ''));
+  const isValid =
+    Number.isFinite(numAmount) &&
+    numAmount > 0 &&
+    Boolean(memo.trim()) &&
+    (splitMode === 'all' || participantIds.length > 0);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const numAmount = Number(amountStr.replace(/,/g, ''));
-    if (!Number.isFinite(numAmount) || numAmount <= 0) return;
-    if (!memo.trim()) return;
+    if (!isValid) return;
 
     onSubmit({
       payerId,

@@ -216,7 +216,7 @@ function AddItemForm({
   return (
     <form
       onSubmit={submit}
-      className="mt-2 flex items-center gap-1.5 rounded-xl border border-dashed border-orange-300 bg-orange-50/40 p-2"
+      className="mt-2 space-y-1.5 rounded-xl border border-dashed border-orange-300 bg-orange-50/40 p-2"
     >
       <input
         type="text"
@@ -224,31 +224,33 @@ function AddItemForm({
         onChange={(e) => setName(e.target.value)}
         placeholder={`+ ${type} 항목 추가`}
         maxLength={30}
-        className="flex-1 rounded-md border border-line bg-card px-2 py-1.5 text-sm"
+        className="w-full rounded-md border border-line bg-card px-2 py-1.5 text-sm"
       />
-      {type === '공용' && (
-        <select
-          value={assigneeId}
-          onChange={(e) => setAssigneeId(e.target.value)}
-          className="rounded-md border border-line bg-card px-1.5 py-1.5 text-xs"
+      <div className="flex gap-1.5">
+        {type === '공용' && (
+          <select
+            value={assigneeId}
+            onChange={(e) => setAssigneeId(e.target.value)}
+            className="min-w-0 flex-1 rounded-md border border-line bg-card px-1.5 py-1.5 text-xs"
+          >
+            <option value="">담당 X</option>
+            {members
+              .filter((m) => m.confirmed)
+              .map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.emoji} {m.name}
+                </option>
+              ))}
+          </select>
+        )}
+        <button
+          type="submit"
+          disabled={!name.trim()}
+          className="shrink-0 rounded-md bg-orange-500 px-4 py-1.5 text-xs font-bold text-white disabled:opacity-40"
         >
-          <option value="">담당 X</option>
-          {members
-            .filter((m) => m.confirmed)
-            .map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.emoji} {m.name}
-              </option>
-            ))}
-        </select>
-      )}
-      <button
-        type="submit"
-        disabled={!name.trim()}
-        className="shrink-0 rounded-md bg-orange-500 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
-      >
-        추가
-      </button>
+          추가
+        </button>
+      </div>
     </form>
   );
 }
