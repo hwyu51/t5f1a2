@@ -70,13 +70,6 @@ export type PackingCheck = {
   checked: boolean;
 };
 
-export type Receipt = {
-  url: string;
-  thumbnailUrl?: string;
-  filename: string;
-  uploadedAt: number;
-};
-
 export type Expense = {
   id: string;
   payerId: string;
@@ -89,7 +82,6 @@ export type Expense = {
   participantIds?: string[]; // splitMode='subset'일 때만
   date: string;
   createdAt: number;
-  receipts?: Receipt[];
   pending?: boolean; // 예정 지출 (정산 대상에서 제외)
 };
 

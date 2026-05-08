@@ -1,23 +1,26 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useFirestoreDoc } from './useFirestoreDoc';
 
-const STORAGE_KEY = 'schedule-choices';
+type State = { choices: Record<string, string> };
 
-type Choices = Record<string, string>; // scheduleItemId -> placeId
+const PATH = 'state/scheduleChoices';
+const DEFAULT: State = { choices: {} };
 
 export function useScheduleChoices() {
-  const [choices, setChoices] = useLocalStorage<Choices>(STORAGE_KEY, {});
+  const { value, update } = useFirestoreDoc<State>(PATH, DEFAULT);
 
   const choose = (scheduleId: string, placeId: string) => {
-    setChoices((prev) => ({ ...prev, [scheduleId]: placeId }));
+    void update((prev) => ({
+      choices: { ...prev.choices, [scheduleId]: placeId },
+    }));
   };
 
   const clearChoice = (scheduleId: string) => {
-    setChoices((prev) => {
-      const next = { ...prev };
+    void update((prev) => {
+      const next = { ...prev.choices };
       delete next[scheduleId];
-      return next;
+      return { choices: next };
     });
   };
 
-  return { choices, choose, clearChoice };
+  return { choices: value.choices, choose, clearChoice };
 }

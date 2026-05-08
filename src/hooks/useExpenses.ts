@@ -1,32 +1,30 @@
-import { useLocalStorage } from './useLocalStorage';
 import type { Expense } from '../types';
-import { INITIAL_EXPENSES } from '../data/initialExpenses';
+import { useFirestoreCollection } from './useFirestoreCollection';
 
-const DEFAULT: Expense[] = INITIAL_EXPENSES.map((e, i) => ({
-  ...e,
-  id: `seed-${i}`,
-  createdAt: 0,
-}));
+type ExpenseDoc = Omit<Expense, 'id'>;
 
 export function useExpenses() {
-  const [expenses, setExpenses] = useLocalStorage<Expense[]>('expenses', DEFAULT);
+  const { docs, add, update, remove } = useFirestoreCollection<ExpenseDoc>(
+    'expenses',
+    { orderField: 'createdAt', orderDir: 'asc' },
+  );
 
-  const add = (input: Omit<Expense, 'id' | 'createdAt'>) => {
-    const newExpense: Expense = {
-      ...input,
-      id: `e-${Date.now()}`,
-      createdAt: Date.now(),
-    };
-    setExpenses((prev) => [...prev, newExpense]);
+  const expenses: Expense[] = docs;
+
+  const addExpense = (input: Omit<Expense, 'id' | 'createdAt'>) => {
+    return add({ ...input, createdAt: Date.now() });
   };
 
-  const update = (id: string, patch: Partial<Expense>) => {
-    setExpenses((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  const updateExpense = (id: string, patch: Partial<Expense>) => {
+    return update(id, patch as Partial<ExpenseDoc>);
   };
 
-  const remove = (id: string) => {
-    setExpenses((prev) => prev.filter((e) => e.id !== id));
-  };
+  const removeExpense = (id: string) => remove(id);
 
-  return { expenses, add, update, remove };
+  return {
+    expenses,
+    add: addExpense,
+    update: updateExpense,
+    remove: removeExpense,
+  };
 }

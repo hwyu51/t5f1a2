@@ -1,5 +1,7 @@
 import type { Expense } from '../types';
 
+// 참고용 시드. Firestore 'expenses' 컬렉션이 비어있으면 사용자가 직접 등록.
+// 자동 입력은 안 함 (멤버 동시 접속 시 중복 위험).
 export const INITIAL_EXPENSES: Omit<Expense, 'id' | 'createdAt'>[] = [
   {
     payerId: 'hyewon',
@@ -7,7 +9,6 @@ export const INITIAL_EXPENSES: Omit<Expense, 'id' | 'createdAt'>[] = [
     memo: '대천 해녀펜션 2층 독채 (1박)',
     splitMode: 'all',
     date: '2026-07-25',
-    receipts: [],
   },
   {
     payerId: '', // 현장 결제할 사람 (도착 후 등록)
@@ -15,7 +16,6 @@ export const INITIAL_EXPENSES: Omit<Expense, 'id' | 'createdAt'>[] = [
     memo: '펜션 그릴+숯 대여 (4인 2만원 × 2 = 4만원, 현장 결제 예정)',
     splitMode: 'all',
     date: '2026-07-25',
-    receipts: [],
     pending: true,
   },
   // 진행하면서 추가:

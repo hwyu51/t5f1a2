@@ -1,15 +1,20 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useFirestoreDoc } from './useFirestoreDoc';
 
-type Checks = Record<string, boolean>;
+type State = { checks: Record<string, boolean> };
+
+const PATH = 'state/ingredientChecks';
+const DEFAULT: State = { checks: {} };
 
 export function useIngredientChecks() {
-  const [checks, setChecks] = useLocalStorage<Checks>('ingredient-checks', {});
+  const { value, update } = useFirestoreDoc<State>(PATH, DEFAULT);
 
   const toggle = (key: string) => {
-    setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+    void update((prev) => ({
+      checks: { ...prev.checks, [key]: !prev.checks[key] },
+    }));
   };
 
-  const isChecked = (key: string) => Boolean(checks[key]);
+  const isChecked = (key: string) => Boolean(value.checks[key]);
 
-  return { checks, toggle, isChecked };
+  return { checks: value.checks, toggle, isChecked };
 }

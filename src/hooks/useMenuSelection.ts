@@ -1,20 +1,22 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useFirestoreDoc } from './useFirestoreDoc';
+
+type State = { selectedIds: string[] };
+
+const PATH = 'state/menuSelection';
+const DEFAULT: State = { selectedIds: [] };
 
 export function useMenuSelection() {
-  const [selectedIds, setSelected] = useLocalStorage<string[]>(
-    'menu-selection',
-    [],
-  );
+  const { value, update } = useFirestoreDoc<State>(PATH, DEFAULT);
 
   const toggle = (menuId: string) => {
-    setSelected((prev) =>
-      prev.includes(menuId)
-        ? prev.filter((id) => id !== menuId)
-        : [...prev, menuId],
-    );
+    void update((prev) => ({
+      selectedIds: prev.selectedIds.includes(menuId)
+        ? prev.selectedIds.filter((id) => id !== menuId)
+        : [...prev.selectedIds, menuId],
+    }));
   };
 
-  const isSelected = (menuId: string) => selectedIds.includes(menuId);
+  const isSelected = (menuId: string) => value.selectedIds.includes(menuId);
 
-  return { selectedIds, toggle, isSelected };
+  return { selectedIds: value.selectedIds, toggle, isSelected };
 }
