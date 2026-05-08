@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react';
 import Card from '../components/Card';
 import ExpenseForm from '../components/ExpenseForm';
 import Section from '../components/Section';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useExpenses } from '../hooks/useExpenses';
 import { useMembers } from '../hooks/useMembers';
+import { logAudit } from '../utils/audit';
 import { calculateBalances, calculateTransfers } from '../utils/settlement';
 import type { Expense } from '../types';
 
 export default function BudgetPage() {
+  const { user } = useCurrentUser();
   const { members } = useMembers();
   const { expenses, add, update, remove } = useExpenses();
   const [formOpen, setFormOpen] = useState(false);
@@ -30,13 +33,41 @@ export default function BudgetPage() {
 
   const memberById = (id: string) => members.find((m) => m.id === id);
 
-  const handleSubmit = (input: Omit<Expense, 'id' | 'createdAt'>) => {
+  const handleSubmit = async (input: Omit<Expense, 'id' | 'createdAt'>) => {
     if (editing) {
-      update(editing.id, input);
+      await update(editing.id, input);
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '지출 수정',
+          target: `${input.memo} (${input.amount.toLocaleString()}원)`,
+        });
+      }
     } else {
-      add(input);
+      await add(input);
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '지출 추가',
+          target: `${input.memo} (${input.amount.toLocaleString()}원)`,
+        });
+      }
     }
     setEditing(null);
+  };
+
+  const handleRemove = async (e: Expense) => {
+    await remove(e.id);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '지출 삭제',
+        target: `${e.memo} (${e.amount.toLocaleString()}원)`,
+      });
+    }
   };
 
   const openAdd = () => {
@@ -202,7 +233,7 @@ export default function BudgetPage() {
                       type="button"
                       onClick={() => {
                         if (window.confirm(`'${e.memo}' 지출을 지울까?`)) {
-                          remove(e.id);
+                          void handleRemove(e);
                         }
                       }}
                       className="rounded-md px-2 py-1 text-[11px] text-red-500 hover:bg-red-50"

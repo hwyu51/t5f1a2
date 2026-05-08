@@ -4,8 +4,10 @@ import Card from '../components/Card';
 import MenuCard from '../components/MenuCard';
 import Section from '../components/Section';
 import { MENUS } from '../data/menus';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCustomMenus } from '../hooks/useCustomMenus';
 import { useMenuSelection } from '../hooks/useMenuSelection';
+import { logAudit } from '../utils/audit';
 import type { Menu } from '../types';
 
 const CATEGORY_ORDER: Menu['category'][] = ['식사', '안주', '간식'];
@@ -17,9 +19,34 @@ const CATEGORY_ICON: Record<Menu['category'], string> = {
 };
 
 export default function MenusPage() {
+  const { user } = useCurrentUser();
   const { selectedIds, isSelected, toggle } = useMenuSelection();
   const { menus: customMenus, add, remove } = useCustomMenus();
   const [formOpen, setFormOpen] = useState(false);
+
+  const handleAdd = async (input: Omit<Menu, 'id'>) => {
+    await add(input);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '메뉴 추가',
+        target: input.name,
+      });
+    }
+  };
+
+  const handleRemove = async (menu: Menu) => {
+    await remove(menu);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '메뉴 삭제',
+        target: menu.name,
+      });
+    }
+  };
 
   const allMenus = useMemo(() => [...MENUS, ...customMenus], [customMenus]);
 
@@ -81,7 +108,7 @@ export default function MenusPage() {
                 selected={isSelected(menu.id)}
                 onToggle={toggle}
                 canDelete={isCustom(menu.id)}
-                onDelete={() => remove(menu)}
+                onDelete={() => handleRemove(menu)}
               />
             ))}
           </div>
@@ -91,7 +118,7 @@ export default function MenusPage() {
       <AddMenuForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        onAdd={add}
+        onAdd={handleAdd}
       />
     </div>
   );

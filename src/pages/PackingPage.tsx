@@ -3,16 +3,43 @@ import Card from '../components/Card';
 import Section from '../components/Section';
 import { PACKING } from '../data/packing';
 import { useAdminMode } from '../hooks/useAdminMode';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCustomPackingItems } from '../hooks/useCustomPackingItems';
 import { useMembers } from '../hooks/useMembers';
 import { usePackingChecks } from '../hooks/usePackingChecks';
+import { logAudit } from '../utils/audit';
 import type { Member, PackingItem } from '../types';
 
 export default function PackingPage() {
+  const { user } = useCurrentUser();
   const { members } = useMembers();
   const { isChecked, toggle } = usePackingChecks();
   const { items: customItems, add, remove } = useCustomPackingItems();
   const { isAdmin } = useAdminMode();
+
+  const handleAdd = async (input: Omit<PackingItem, 'id'>) => {
+    await add(input);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '준비물 추가',
+        target: input.name,
+      });
+    }
+  };
+
+  const handleRemove = async (item: PackingItem) => {
+    await remove(item);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '준비물 삭제',
+        target: item.name,
+      });
+    }
+  };
 
   const all = useMemo(() => [...PACKING, ...customItems], [customItems]);
 
@@ -67,12 +94,12 @@ export default function PackingPage() {
               onToggle={() => toggle(item.id)}
               members={members}
               canDelete={isAdmin && isCustom(item.id)}
-              onDelete={() => remove(item)}
+              onDelete={() => handleRemove(item)}
             />
           ))}
         </div>
         {isAdmin && (
-          <AddItemForm type="공용" members={members} onAdd={add} />
+          <AddItemForm type="공용" members={members} onAdd={handleAdd} />
         )}
       </Section>
 
@@ -86,12 +113,12 @@ export default function PackingPage() {
               onToggle={() => toggle(item.id)}
               members={members}
               canDelete={isAdmin && isCustom(item.id)}
-              onDelete={() => remove(item)}
+              onDelete={() => handleRemove(item)}
             />
           ))}
         </div>
         {isAdmin && (
-          <AddItemForm type="개인" members={members} onAdd={add} />
+          <AddItemForm type="개인" members={members} onAdd={handleAdd} />
         )}
       </Section>
     </div>

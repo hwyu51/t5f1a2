@@ -8,6 +8,7 @@ import { TRIP } from '../data/trip';
 import { useAdminMode } from '../hooks/useAdminMode';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useMembers } from '../hooks/useMembers';
+import { logAudit } from '../utils/audit';
 
 const TARGET_ISO = `${TRIP.startDate}T${TRIP.departureTime}:00+09:00`;
 
@@ -102,7 +103,18 @@ export default function Home() {
               </span>
               <button
                 type="button"
-                onClick={() => setConfirmed('jongmin', !jongmin.confirmed)}
+                onClick={() => {
+                  const next = !jongmin.confirmed;
+                  setConfirmed('jongmin', next);
+                  if (user) {
+                    void logAudit({
+                      actorId: user.id,
+                      actorName: user.name,
+                      action: '종민 합류',
+                      target: next ? '확정' : '미정',
+                    });
+                  }
+                }}
                 className="rounded-lg border border-orange-500 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700"
               >
                 {jongmin.confirmed ? '미정으로' : '확정으로'}

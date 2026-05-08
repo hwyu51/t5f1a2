@@ -102,14 +102,6 @@ export const SCHEDULE: ScheduleItem[] = [
     title: '일어나서 짐 정리',
   },
   {
-    id: 's13',
-    day: 2,
-    time: '10:30',
-    title: '아침 — 게국지 해장',
-    placeOptions: ['restaurant-samsam', 'restaurant-pungmi'],
-    note: '추천: 대천삼삼꽃게장 (평점 4.6) / 풍미꽃게장게국지(리뷰 많음)',
-  },
-  {
     id: 's14',
     day: 2,
     time: '11:00',
@@ -117,9 +109,17 @@ export const SCHEDULE: ScheduleItem[] = [
     placeId: 'lodging',
   },
   {
+    id: 's13',
+    day: 2,
+    time: '11:30',
+    title: '아침 — 게국지 해장',
+    placeOptions: ['restaurant-samsam', 'restaurant-pungmi'],
+    note: '체크아웃 후 식당 이동. 추천: 대천삼삼꽃게장 (평점 4.6) / 풍미꽃게장게국지(리뷰 많음)',
+  },
+  {
     id: 's15',
     day: 2,
-    time: '12:00',
+    time: '12:30',
     title: '대천 스카이바이크',
     placeId: 'skybike',
     note: '⚠️ 현장에서 표 삼 (예약 X), 음주자 X. 4인 2대 분배',
