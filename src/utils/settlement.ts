@@ -2,14 +2,14 @@ import type { Expense, Member } from '../types';
 
 export type Balance = {
   memberId: string;
-  paid: number; // 낸 금액 합
-  share: number; // 분담해야 할 금액 합
-  net: number; // paid - share. 양수=받을 돈, 음수=낼 돈
+  paid: number;
+  share: number;
+  net: number;
 };
 
 export type Transfer = {
-  from: string; // 보낼 사람 ID
-  to: string; // 받을 사람 ID
+  from: string;
+  to: string;
   amount: number;
 };
 
@@ -19,26 +19,7 @@ export type GroupedTransfer = {
   total: number;
 };
 
-/**
- * 같은 받는 사람끼리 묶음. 카드 N개 → 받는 사람 M개로 압축.
- */
-export function groupTransfersByTo(transfers: Transfer[]): GroupedTransfer[] {
-  const map = new Map<string, GroupedTransfer>();
-  for (const t of transfers) {
-    const g = map.get(t.to) ?? { toId: t.to, fromList: [], total: 0 };
-    g.fromList.push({ fromId: t.from, amount: t.amount });
-    g.total += t.amount;
-    map.set(t.to, g);
-  }
-  return Array.from(map.values()).sort((a, b) => b.total - a.total);
-}
-
-/**
- * 멤버별 잔액 계산.
- * - pending=true 지출은 제외
- * - splitMode='all'이면 전체 멤버 N분의1 (단, 미확정 멤버 제외 옵션은 false: 시드는 confirmed만 자동)
- * - splitMode='subset'이면 participantIds만
- */
+/** 멤버별 잔액 (1인 잔액 표시용) */
 export function calculateBalances(expenses: Expense[], members: Member[]): Balance[] {
   const confirmed = members.filter((m) => m.confirmed);
   const balanceMap = new Map<string, Balance>();
@@ -50,19 +31,15 @@ export function calculateBalances(expenses: Expense[], members: Member[]): Balan
     if (exp.pending) continue;
     if (exp.amount <= 0) continue;
 
-    // 지급자
     if (exp.payerId) {
       const payerBal = balanceMap.get(exp.payerId);
       if (payerBal) payerBal.paid += exp.amount;
     }
 
-    // 분담 대상
-    let participants: string[];
-    if (exp.splitMode === 'subset') {
-      participants = exp.participantIds ?? [];
-    } else {
-      participants = confirmed.map((m) => m.id);
-    }
+    const participants =
+      exp.splitMode === 'subset'
+        ? exp.participantIds ?? []
+        : confirmed.map((m) => m.id);
     if (participants.length === 0) continue;
 
     const perPerson = exp.amount / participants.length;
@@ -82,34 +59,70 @@ export function calculateBalances(expenses: Expense[], members: Member[]): Balan
 }
 
 /**
- * 잔액 → 최소 송금 횟수로 정산하는 transfer 목록.
- * Greedy: 최댓값(받을 사람) ↔ 최솟값(낼 사람) 매칭.
+ * 결제자별 송금 계산.
+ * - 각 expense에서 (참여자 - 결제자)가 결제자에게 1/N씩 보냄
+ * - 같은 (from, to) 쌍은 합산
+ * - 양방향(A→B, B→A)이 둘 다 있으면 차액만 한 방향으로
+ *
+ * 송금 횟수 최소(greedy)보다 약간 많지만 사용자 직관에 부합:
+ * 한 사람이 결제한 건은 분담자들이 그 결제자에게 송금.
  */
-export function calculateTransfers(balances: Balance[]): Transfer[] {
-  const debtors = balances
-    .filter((b) => b.net < 0)
-    .map((b) => ({ id: b.memberId, amount: -b.net }))
-    .sort((a, b) => b.amount - a.amount);
-  const creditors = balances
-    .filter((b) => b.net > 0)
-    .map((b) => ({ id: b.memberId, amount: b.net }))
-    .sort((a, b) => b.amount - a.amount);
+export function calculateTransfers(
+  expenses: Expense[],
+  members: Member[],
+): Transfer[] {
+  const confirmed = members.filter((m) => m.confirmed);
+  const pairs = new Map<string, number>(); // `from|to` → amount
 
-  const transfers: Transfer[] = [];
-  let i = 0;
-  let j = 0;
-  while (i < debtors.length && j < creditors.length) {
-    const debtor = debtors[i];
-    const creditor = creditors[j];
-    const amount = Math.min(debtor.amount, creditor.amount);
-    if (amount > 0) {
-      transfers.push({ from: debtor.id, to: creditor.id, amount });
+  for (const exp of expenses) {
+    if (exp.pending || !exp.payerId || exp.amount <= 0) continue;
+    const participants =
+      exp.splitMode === 'subset'
+        ? exp.participantIds ?? []
+        : confirmed.map((m) => m.id);
+    if (participants.length === 0) continue;
+
+    const perPerson = exp.amount / participants.length;
+    for (const pid of participants) {
+      if (pid === exp.payerId) continue; // 결제자 본인은 제외
+      const key = `${pid}|${exp.payerId}`;
+      pairs.set(key, (pairs.get(key) ?? 0) + perPerson);
     }
-    debtor.amount -= amount;
-    creditor.amount -= amount;
-    if (debtor.amount === 0) i++;
-    if (creditor.amount === 0) j++;
+  }
+
+  // 양방향 상쇄
+  const transfers: Transfer[] = [];
+  const seen = new Set<string>();
+  for (const [key, amount] of pairs) {
+    if (seen.has(key)) continue;
+    const [from, to] = key.split('|');
+    if (!from || !to) continue;
+    const reverseKey = `${to}|${from}`;
+    const reverse = pairs.get(reverseKey) ?? 0;
+    seen.add(key);
+    seen.add(reverseKey);
+
+    const net = amount - reverse;
+    const rounded = Math.round(Math.abs(net));
+    if (rounded === 0) continue;
+    if (net > 0) {
+      transfers.push({ from, to, amount: rounded });
+    } else {
+      transfers.push({ from: to, to: from, amount: rounded });
+    }
   }
 
   return transfers;
+}
+
+/** 같은 받는 사람끼리 묶음 */
+export function groupTransfersByTo(transfers: Transfer[]): GroupedTransfer[] {
+  const map = new Map<string, GroupedTransfer>();
+  for (const t of transfers) {
+    const g = map.get(t.to) ?? { toId: t.to, fromList: [], total: 0 };
+    g.fromList.push({ fromId: t.from, amount: t.amount });
+    g.total += t.amount;
+    map.set(t.to, g);
+  }
+  return Array.from(map.values()).sort((a, b) => b.total - a.total);
 }

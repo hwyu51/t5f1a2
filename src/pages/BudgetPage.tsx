@@ -60,7 +60,10 @@ export default function BudgetPage() {
     () => calculateBalances(expenses, members),
     [expenses, members],
   );
-  const transfers = useMemo(() => calculateTransfers(balances), [balances]);
+  const transfers = useMemo(
+    () => calculateTransfers(expenses, members),
+    [expenses, members],
+  );
   const grouped = useMemo(() => groupTransfersByTo(transfers), [transfers]);
 
   const myTransfers = useMemo(() => {
