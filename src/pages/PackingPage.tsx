@@ -7,41 +7,30 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCustomPackingItems } from '../hooks/useCustomPackingItems';
 import { useMembers } from '../hooks/useMembers';
 import { usePackingChecks } from '../hooks/usePackingChecks';
+import { usePackingOverrides } from '../hooks/usePackingOverrides';
 import { logAudit } from '../utils/audit';
 import type { Member, PackingItem } from '../types';
+
+type EditPatch = Partial<Pick<PackingItem, 'name' | 'assigneeId'>>;
 
 export default function PackingPage() {
   const { user } = useCurrentUser();
   const { members } = useMembers();
   const { isChecked, toggle } = usePackingChecks();
-  const { items: customItems, add, remove } = useCustomPackingItems();
+  const {
+    items: customItems,
+    add: addCustom,
+    remove: removeCustom,
+    update: updateCustom,
+  } = useCustomPackingItems();
+  const { overrides, setOverride } = usePackingOverrides();
   const { isAdmin } = useAdminMode();
 
-  const handleAdd = async (input: Omit<PackingItem, 'id'>) => {
-    await add(input);
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '준비물 추가',
-        target: input.name,
-      });
-    }
-  };
-
-  const handleRemove = async (item: PackingItem) => {
-    await remove(item);
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '준비물 삭제',
-        target: item.name,
-      });
-    }
-  };
-
-  const all = useMemo(() => [...PACKING, ...customItems], [customItems]);
+  // 시드 + override 병합 + 사용자 추가
+  const all = useMemo(() => {
+    const seedMerged = PACKING.map((p) => ({ ...p, ...(overrides[p.id] ?? {}) }));
+    return [...seedMerged, ...customItems];
+  }, [customItems, overrides]);
 
   const groups = useMemo(
     () => ({
@@ -57,6 +46,51 @@ export default function PackingPage() {
   const checkedCount = all.filter((p) => isChecked(p.id)).length;
   const percent = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
 
+  const handleAdd = async (input: Omit<PackingItem, 'id'>) => {
+    await addCustom(input);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '준비물 추가',
+        target: input.name,
+      });
+    }
+  };
+
+  const handleRemove = async (item: PackingItem) => {
+    await removeCustom(item);
+    if (user) {
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '준비물 삭제',
+        target: item.name,
+      });
+    }
+  };
+
+  const handleEdit = async (item: PackingItem, patch: EditPatch) => {
+    if (isCustom(item.id)) {
+      // 사용자 추가 항목: arrayRemove + arrayUnion
+      const original = customItems.find((c) => c.id === item.id);
+      if (!original) return;
+      await updateCustom(original, patch);
+    } else {
+      // 시드 항목: override
+      setOverride(item.id, patch);
+    }
+    if (user) {
+      const fields = Object.keys(patch).join('/');
+      void logAudit({
+        actorId: user.id,
+        actorName: user.name,
+        action: '준비물 수정',
+        target: `${item.name} (${fields})`,
+      });
+    }
+  };
+
   return (
     <div className="space-y-4 pb-4">
       <div className="px-4 pt-5">
@@ -66,7 +100,6 @@ export default function PackingPage() {
         </p>
       </div>
 
-      {/* 진행률 */}
       <Section>
         <Card className="!p-3">
           <div className="mb-1.5 flex items-baseline justify-between text-xs font-medium text-ink-muted">
@@ -93,8 +126,10 @@ export default function PackingPage() {
               checked={isChecked(item.id)}
               onToggle={() => toggle(item.id)}
               members={members}
+              isAdmin={isAdmin}
               canDelete={isAdmin && isCustom(item.id)}
               onDelete={() => handleRemove(item)}
+              onEdit={(patch) => handleEdit(item, patch)}
             />
           ))}
         </div>
@@ -112,8 +147,10 @@ export default function PackingPage() {
               checked={isChecked(item.id)}
               onToggle={() => toggle(item.id)}
               members={members}
+              isAdmin={isAdmin}
               canDelete={isAdmin && isCustom(item.id)}
               onDelete={() => handleRemove(item)}
+              onEdit={(patch) => handleEdit(item, patch)}
             />
           ))}
         </div>
@@ -130,19 +167,38 @@ function PackingRow({
   checked,
   onToggle,
   members,
+  isAdmin,
   canDelete,
   onDelete,
+  onEdit,
 }: {
   item: PackingItem;
   checked: boolean;
   onToggle: () => void;
   members: Member[];
+  isAdmin: boolean;
   canDelete?: boolean;
   onDelete?: () => void;
+  onEdit: (patch: EditPatch) => void;
 }) {
+  const [editing, setEditing] = useState(false);
   const assignee = item.assigneeId
     ? members.find((m) => m.id === item.assigneeId)
     : undefined;
+
+  if (editing) {
+    return (
+      <EditRow
+        item={item}
+        members={members}
+        onSave={(patch) => {
+          onEdit(patch);
+          setEditing(false);
+        }}
+        onCancel={() => setEditing(false)}
+      />
+    );
+  }
 
   return (
     <div className="flex items-center gap-1">
@@ -173,6 +229,16 @@ function PackingRow({
           </span>
         )}
       </button>
+      {isAdmin && (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="shrink-0 rounded-md px-2 py-2 text-xs text-ink-muted hover:bg-cream-100"
+          aria-label="수정"
+        >
+          ✏️
+        </button>
+      )}
       {canDelete && (
         <button
           type="button"
@@ -186,6 +252,78 @@ function PackingRow({
         </button>
       )}
     </div>
+  );
+}
+
+function EditRow({
+  item,
+  members,
+  onSave,
+  onCancel,
+}: {
+  item: PackingItem;
+  members: Member[];
+  onSave: (patch: EditPatch) => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(item.name);
+  const [assigneeId, setAssigneeId] = useState(item.assigneeId ?? '');
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    const patch: EditPatch = { name: name.trim() };
+    if (item.type === '공용') {
+      patch.assigneeId = assigneeId || undefined;
+    }
+    onSave(patch);
+  };
+
+  return (
+    <form
+      onSubmit={submit}
+      className="space-y-1.5 rounded-xl border-2 border-orange-400 bg-orange-50/50 p-2"
+    >
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        maxLength={30}
+        className="w-full rounded-md border border-line bg-card px-2 py-1.5 text-sm"
+      />
+      <div className="flex gap-1.5">
+        {item.type === '공용' && (
+          <select
+            value={assigneeId}
+            onChange={(e) => setAssigneeId(e.target.value)}
+            className="min-w-0 flex-1 rounded-md border border-line bg-card px-1.5 py-1.5 text-xs"
+          >
+            <option value="">담당 X</option>
+            {members
+              .filter((m) => m.confirmed)
+              .map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.emoji} {m.name}
+                </option>
+              ))}
+          </select>
+        )}
+        <button
+          type="button"
+          onClick={onCancel}
+          className="shrink-0 rounded-md border border-line bg-card px-3 py-1.5 text-xs text-ink-muted"
+        >
+          취소
+        </button>
+        <button
+          type="submit"
+          disabled={!name.trim()}
+          className="shrink-0 rounded-md bg-orange-500 px-4 py-1.5 text-xs font-bold text-white disabled:opacity-40"
+        >
+          저장
+        </button>
+      </div>
+    </form>
   );
 }
 

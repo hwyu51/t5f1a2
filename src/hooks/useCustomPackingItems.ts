@@ -53,5 +53,15 @@ export function useCustomPackingItems() {
     await setDoc(doc(db, PATH), { items: arrayRemove(item) }, { merge: true });
   };
 
-  return { items, add, remove };
+  const update = async (
+    oldItem: PackingItem,
+    patch: Partial<Pick<PackingItem, 'name' | 'assigneeId'>>,
+  ) => {
+    const updated: PackingItem = { ...oldItem, ...patch };
+    // assigneeId가 빈 문자열이면 필드 자체 제거 효과 — Firestore arrayUnion은 객체 동등성이라 형태 일치 필요
+    await setDoc(doc(db, PATH), { items: arrayRemove(oldItem) }, { merge: true });
+    await setDoc(doc(db, PATH), { items: arrayUnion(updated) }, { merge: true });
+  };
+
+  return { items, add, remove, update };
 }
