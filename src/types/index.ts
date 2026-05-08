@@ -2,6 +2,7 @@ export type Member = {
   id: string;
   name: string;
   emoji?: string;
+  mbti?: string;
   isDriver?: boolean;
   confirmed: boolean;
 };
@@ -72,12 +73,6 @@ export type PackingItem = {
 export type PackingCheck = {
   itemId: string;
   checked: boolean;
-};
-
-export type CarAssignment = {
-  car1: { driverId: string; passengerIds: string[] };
-  car2: { driverId: string; passengerIds: string[] };
-  generatedAt: number;
 };
 
 export type Receipt = {

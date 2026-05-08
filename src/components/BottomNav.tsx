@@ -13,7 +13,6 @@ const TABS: Tab[] = [
   { to: '/schedule', label: '일정', icon: '📅' },
   { to: '/lodging', label: '숙소', icon: '🏖' },
   { to: '/packing', label: '준비물', icon: '🎒' },
-  { to: '/cars', label: '차량', icon: '🚗' },
 ];
 
 const TAB_ITEM_CLASS =

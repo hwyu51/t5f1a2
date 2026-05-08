@@ -6,9 +6,9 @@ export const SCHEDULE: ScheduleItem[] = [
     id: 's01',
     day: 1,
     time: '09:30',
-    title: '지연이네 집합 + 사다리타기',
+    title: '지연이네 집합',
     placeId: 'meeting-jiyeon',
-    note: '차량별 탑승자 사다리/제비뽑기로 결정',
+    note: '여기서 다 같이 출발',
   },
   {
     id: 's02',

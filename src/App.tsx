@@ -6,7 +6,6 @@ import LodgingPage from './pages/LodgingPage';
 import MenusPage from './pages/MenusPage';
 import ShoppingPage from './pages/ShoppingPage';
 import PackingPage from './pages/PackingPage';
-import CarsPage from './pages/CarsPage';
 import BudgetPage from './pages/BudgetPage';
 
 export default function App() {
@@ -19,7 +18,6 @@ export default function App() {
         <Route path="/menus" element={<MenusPage />} />
         <Route path="/shopping" element={<ShoppingPage />} />
         <Route path="/packing" element={<PackingPage />} />
-        <Route path="/cars" element={<CarsPage />} />
         <Route path="/budget" element={<BudgetPage />} />
       </Route>
     </Routes>

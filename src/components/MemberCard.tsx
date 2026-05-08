@@ -20,9 +20,8 @@ export default function MemberCard({ member, isSelf = false }: Props) {
         {member.confirmed ? (member.emoji ?? '🙂') : '❓'}
       </div>
       <div className="text-sm font-bold text-ink">{member.name}</div>
-      <div className="text-[10px] text-ink-muted">
-        {member.isDriver ? '🚗 운전' : member.confirmed ? '확정' : '미정'}
-        {isSelf && ' · 나'}
+      <div className="text-[10px] font-bold tracking-widest text-ink-muted">
+        {member.confirmed ? member.mbti ?? '' : '미정'}
       </div>
     </div>
   );
