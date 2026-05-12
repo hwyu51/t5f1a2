@@ -5,6 +5,7 @@ import { PACKING } from '../data/packing';
 import { useAdminMode } from '../hooks/useAdminMode';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCustomPackingItems } from '../hooks/useCustomPackingItems';
+import { useCustomPersonalPackingItems } from '../hooks/useCustomPersonalPackingItems';
 import { useMembers } from '../hooks/useMembers';
 import { usePackingChecks } from '../hooks/usePackingChecks';
 import { usePackingOverrides } from '../hooks/usePackingOverrides';
@@ -18,19 +19,25 @@ export default function PackingPage() {
   const { members } = useMembers();
   const { isChecked, toggle } = usePackingChecks();
   const {
-    items: customItems,
-    add: addCustom,
-    remove: removeCustom,
-    update: updateCustom,
-  } = useCustomPackingItems();
+    items: customSharedItems,
+    add: addCustomShared,
+    remove: removeCustomShared,
+    update: updateCustomShared,
+  } = useCustomPackingItems(); // 공용 — Firestore, 모두 공유
+  const {
+    items: customPersonalItems,
+    add: addCustomPersonal,
+    remove: removeCustomPersonal,
+    update: updateCustomPersonal,
+  } = useCustomPersonalPackingItems(); // 개인 — 본인 LocalStorage
   const { overrides, setOverride } = usePackingOverrides();
   const { isAdmin } = useAdminMode();
 
-  // 시드 + override 병합 + 사용자 추가
+  // 시드 + override 병합 + 사용자 공용 + 사용자 개인
   const all = useMemo(() => {
     const seedMerged = PACKING.map((p) => ({ ...p, ...(overrides[p.id] ?? {}) }));
-    return [...seedMerged, ...customItems];
-  }, [customItems, overrides]);
+    return [...seedMerged, ...customSharedItems, ...customPersonalItems];
+  }, [customSharedItems, customPersonalItems, overrides]);
 
   const groups = useMemo(
     () => ({
@@ -40,42 +47,56 @@ export default function PackingPage() {
     [all],
   );
 
-  const isCustom = (id: string) => customItems.some((c) => c.id === id);
+  const isCustomShared = (id: string) =>
+    customSharedItems.some((c) => c.id === id);
+  const isCustomPersonal = (id: string) =>
+    customPersonalItems.some((c) => c.id === id);
+  const isCustom = (id: string) => isCustomShared(id) || isCustomPersonal(id);
 
   const total = all.length;
   const checkedCount = all.filter((p) => isChecked(p.id)).length;
   const percent = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
 
   const handleAdd = async (input: Omit<PackingItem, 'id'>) => {
-    await addCustom(input);
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '준비물 추가',
-        target: input.name,
-      });
+    if (input.type === '공용') {
+      await addCustomShared(input);
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '준비물 추가 (공용)',
+          target: input.name,
+        });
+      }
+    } else {
+      // 개인 — 본인 LocalStorage. audit 안 함 (개인이라)
+      addCustomPersonal(input);
     }
   };
 
   const handleRemove = async (item: PackingItem) => {
-    await removeCustom(item);
-    if (user) {
-      void logAudit({
-        actorId: user.id,
-        actorName: user.name,
-        action: '준비물 삭제',
-        target: item.name,
-      });
+    if (isCustomShared(item.id)) {
+      await removeCustomShared(item);
+      if (user) {
+        void logAudit({
+          actorId: user.id,
+          actorName: user.name,
+          action: '준비물 삭제 (공용)',
+          target: item.name,
+        });
+      }
+    } else if (isCustomPersonal(item.id)) {
+      removeCustomPersonal(item);
     }
   };
 
   const handleEdit = async (item: PackingItem, patch: EditPatch) => {
-    if (isCustom(item.id)) {
-      // 사용자 추가 항목: 트랜잭션으로 atomic 수정
-      await updateCustom(item.id, patch);
+    if (isCustomShared(item.id)) {
+      await updateCustomShared(item.id, patch);
+    } else if (isCustomPersonal(item.id)) {
+      updateCustomPersonal(item.id, { name: patch.name });
     } else {
-      // 시드 항목: override
+      // 시드 항목: override (모두 공유)
       setOverride(item.id, patch);
     }
     if (user) {
@@ -94,7 +115,7 @@ export default function PackingPage() {
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">준비물</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          챙긴 항목을 체크해 주세요. 내 기기에만 저장됩니다.
+          체크는 본인별로 저장돼요. 개인 추가 항목은 본인만 보입니다.
         </p>
       </div>
 

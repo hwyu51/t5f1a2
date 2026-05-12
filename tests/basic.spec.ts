@@ -81,7 +81,9 @@ test.describe('기본 흐름', () => {
     await page.locator('input[type="password"]').fill('0501');
     await page.getByRole('button', { name: '확인' }).click();
 
-    // 관리자 배너 표시 확인
-    await expect(page.getByText(/관리자 모드 ON/)).toBeVisible();
+    // 관리자 배너 표시 확인 (배너는 정확히 '🔧 관리자 모드 ON'. 버튼은 '... · 종료')
+    await expect(
+      page.getByText('🔧 관리자 모드 ON', { exact: true }),
+    ).toBeVisible();
   });
 });
