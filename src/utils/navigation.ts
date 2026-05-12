@@ -98,6 +98,14 @@ function buildWebFallback(app: NavApp, target: NavTarget): string {
 }
 
 export function openNav(app: NavApp, target: NavTarget): void {
+  const mobile = isMobile();
+
+  // 티맵은 모바일 앱 전용. 데스크탑은 차단 안내
+  if (app === 'tmap' && !mobile) {
+    window.alert('티맵은 모바일 앱 전용입니다. 카카오 또는 네이버를 이용해 주세요.');
+    return;
+  }
+
   const url = buildNavUrl(app, target);
   const isAppScheme = APP_SCHEMES.some((s) => url.startsWith(s));
   if (!isAppScheme) {
@@ -105,8 +113,9 @@ export function openNav(app: NavApp, target: NavTarget): void {
     return;
   }
 
-  // 앱 스킴 시도 후 1.5초 안에 페이지가 안 숨겨지면 (= 앱 미설치) 웹맵으로 자동 fallback
-  const webUrl = buildWebFallback(app, target);
+  // 카카오/네이버는 미설치 시 같은 브랜드 웹맵으로 fallback
+  // 티맵은 웹 부재라 fallback 없이 안내만
+  const webUrl = app === 'tmap' ? null : buildWebFallback(app, target);
   let didOpen = false;
   const onHide = () => {
     didOpen = true;
@@ -119,14 +128,17 @@ export function openNav(app: NavApp, target: NavTarget): void {
   events.forEach((e) => window.addEventListener(e, onHide));
   document.addEventListener('visibilitychange', onVisibility);
 
-  // 앱 스킴 트리거
   window.location.href = url;
 
   window.setTimeout(() => {
     events.forEach((e) => window.removeEventListener(e, onHide));
     document.removeEventListener('visibilitychange', onVisibility);
     if (!didOpen && document.visibilityState === 'visible') {
-      window.open(webUrl, '_blank', 'noopener,noreferrer');
+      if (webUrl) {
+        window.open(webUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        window.alert('티맵 앱이 필요합니다. 앱스토어/플레이스토어에서 설치해 주세요.');
+      }
     }
   }, 1500);
 }
