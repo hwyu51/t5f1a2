@@ -26,7 +26,16 @@ export default function BudgetPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [tab, setTab] = useState<Tab>('mine');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   // 첫 진입 시 시드 지출 한 번만 등록 (멱등 플래그)
   useEffect(() => {
@@ -232,7 +241,7 @@ export default function BudgetPage() {
           ) : (
             expenses.map((e) => {
               const payer = e.payerId ? memberById(e.payerId) : null;
-              const isExpanded = expandedId === e.id;
+              const isExpanded = expandedIds.has(e.id);
               const participants = e.participantIds
                 ?.map(memberById)
                 .filter((m): m is Member => Boolean(m));
@@ -245,7 +254,7 @@ export default function BudgetPage() {
                 <Card key={e.id} className="!p-3">
                   <button
                     type="button"
-                    onClick={() => setExpandedId(isExpanded ? null : e.id)}
+                    onClick={() => toggleExpanded(e.id)}
                     className="flex w-full items-start gap-3 text-left"
                   >
                     <span className="min-w-0 flex-1">
