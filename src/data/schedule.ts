@@ -3,6 +3,13 @@ import type { ScheduleItem } from '../types';
 export const SCHEDULE: ScheduleItem[] = [
   // === 1일차 (7/25 토) ===
   {
+    id: 's00',
+    day: 1,
+    time: '09:00',
+    title: '렌트카 픽업',
+    note: '반디렌터카 (부평) · 스타리아',
+  },
+  {
     id: 's01',
     day: 1,
     time: '09:30',
@@ -53,7 +60,7 @@ export const SCHEDULE: ScheduleItem[] = [
     time: '14:30',
     title: '머드축제 입장',
     placeId: 'mud-festival',
-    note: '⚠️ 버릴 옷 입고 가. 17:30 입장 마감',
+    note: '⚠️ 버릴 옷 입고 가. 17:30 입장 마감\n⚠️ 지빈 불참 — 얼리버드 6장 예정',
   },
   {
     id: 's07',
@@ -110,19 +117,18 @@ export const SCHEDULE: ScheduleItem[] = [
     note: '체크아웃 후 식당 이동. 추천: 대천삼삼꽃게장 (평점 4.6) / 풍미꽃게장게국지(리뷰 많음)',
   },
   {
-    id: 's15',
-    day: 2,
-    time: '12:30',
-    title: '대천 스카이바이크',
-    placeId: 'skybike',
-    note: '⚠️ 현장에서 표 삼 (예약 X), 음주자 X. 4인 2대 분배',
-  },
-  {
     id: 's16',
     day: 2,
     time: '13:30',
-    title: '집 가자',
+    title: '귀가 출발',
     placeOptions: ['rest-haengdam', 'rest-hwaseong-up'],
     note: '오는 길 휴게소 추천: 행담도 또는 화성휴게소(서울방향)',
+  },
+  {
+    id: 's17',
+    day: 2,
+    time: '20:00',
+    title: '렌트카 반납',
+    note: '반디렌터카 (부평) — 최종 반납 시각',
   },
 ];

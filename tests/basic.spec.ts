@@ -52,17 +52,17 @@ test.describe('기본 흐름', () => {
     await expect(page.getByRole('heading', { name: '메뉴' })).toBeVisible();
   });
 
-  test('일정 페이지 1/2일차 토글', async ({ page }) => {
+  test('일정 페이지 1/2일차 모두 표시', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: /지환/ }).first().click();
     await page.getByRole('link', { name: /일정/ }).click();
 
-    // 1일차가 기본 활성
+    // 두 일차 헤더 모두 노출 (탭 없이 스크롤로 다 보임)
+    await expect(page.getByRole('heading', { name: /1일차/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /2일차/ })).toBeVisible();
+
+    // 1일차 항목
     await expect(page.getByText('지연이네 집합')).toBeVisible();
-
-    // 2일차 탭 클릭
-    await page.getByRole('button', { name: /2일차/ }).click();
-
     // 2일차 항목 (체크아웃 → 게국지 순서)
     await expect(page.getByText('숙소 체크아웃')).toBeVisible();
     await expect(page.getByText('게국지 해장')).toBeVisible();

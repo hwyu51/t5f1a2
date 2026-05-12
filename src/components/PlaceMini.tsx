@@ -31,7 +31,9 @@ export default function PlaceMini({ place, selected, onSelect, onClear }: Props)
             <div className="mt-0.5 text-[11px] text-ink-muted">{place.address}</div>
           )}
           {place.note && (
-            <div className="mt-1.5 text-xs text-ink/80">{place.note}</div>
+            <div className="mt-1.5 whitespace-pre-line text-xs text-ink/80">
+              {place.note}
+            </div>
           )}
         </div>
       </div>
