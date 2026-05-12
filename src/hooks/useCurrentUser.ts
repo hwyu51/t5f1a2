@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { useMembers } from './useMembers';
 
@@ -13,10 +13,18 @@ export function useCurrentUser() {
     [userId, members],
   );
 
+  // 본인 변경 시 자동 페이지 리프레시 — 모든 hook이 새 사용자 기준으로 재초기화됨
+  const clear = useCallback(() => {
+    reset();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  }, [reset]);
+
   return {
     userId,
     user,
     setUserId: (id: string) => setUserId(id),
-    clear: reset,
+    clear,
   };
 }
