@@ -44,10 +44,12 @@ export default function PackingPage() {
   const { overrides, setOverride } = usePackingOverrides();
   const { isAdmin } = useAdminMode();
 
-  // 시드 + override 병합 + 사용자 공용 + 사용자 개인
+  // 시드 + override 병합 + 사용자 공용(type='공용'만) + 사용자 개인
+  // (예전 마이그레이션 이전에 공유 컬렉션에 잘못 들어간 개인 항목은 표시 X)
   const all = useMemo(() => {
     const seedMerged = PACKING.map((p) => ({ ...p, ...(overrides[p.id] ?? {}) }));
-    return [...seedMerged, ...customSharedItems, ...customPersonalItems];
+    const sharedOnly = customSharedItems.filter((c) => c.type === '공용');
+    return [...seedMerged, ...sharedOnly, ...customPersonalItems];
   }, [customSharedItems, customPersonalItems, overrides]);
 
   const groups = useMemo(

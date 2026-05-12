@@ -8,7 +8,7 @@ export const PACKING: PackingItem[] = [
   { id: 'p04', name: '아이스박스', type: '공용' },
   { id: 'p05', name: '블루투스 스피커', type: '공용', assigneeId: 'jibin' },
   { id: 'p06', name: '카발란 위스키', type: '공용', assigneeId: 'jihwan' },
-  { id: 'p08', name: '물티슈/키친타월', type: '공용' },
+  { id: 'p08', name: '물티슈/휴지', type: '공용' },
   { id: 'p13', name: '호일', type: '공용' },
 
   // === 개인 ===
