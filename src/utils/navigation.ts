@@ -46,11 +46,14 @@ export function buildNavUrl(app: NavApp, target: NavTarget): string {
     const query = encodeURIComponent(address || name);
     switch (app) {
       case 'kakao':
-        return `https://map.kakao.com/?q=${query}`;
+        return mobile
+          ? `kakaomap://search?q=${query}`
+          : `https://map.kakao.com/?q=${query}`;
       case 'naver':
-        return `https://map.naver.com/v5/search/${query}`;
+        return mobile
+          ? `nmap://search?query=${query}&appname=t5f1a2`
+          : `https://map.naver.com/v5/search/${query}`;
       case 'tmap':
-        // 티맵 모바일은 검색 스킴, 데스크탑은 티맵 웹 부재라 카카오로
         return mobile
           ? `tmap://search?name=${query}`
           : `https://map.kakao.com/?q=${query}`;
@@ -67,8 +70,9 @@ export function buildNavUrl(app: NavApp, target: NavTarget): string {
         ? `tmap://route?goalname=${encName}&goalx=${lng}&goaly=${lat}`
         : `https://map.kakao.com/link/to/${encName},${lat},${lng}`;
     case 'naver':
+      // 네이버맵은 appname 파라미터 필수 — 없으면 앱이 안 열림
       return mobile
-        ? `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encName}`
+        ? `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encName}&appname=t5f1a2`
         : `https://map.naver.com/v5/directions/-/${lng},${lat},${encName}/-/car`;
   }
 }
