@@ -8,6 +8,7 @@ import { useCustomPackingItems } from '../hooks/useCustomPackingItems';
 import { useCustomPersonalPackingItems } from '../hooks/useCustomPersonalPackingItems';
 import { useMembers } from '../hooks/useMembers';
 import { usePackingChecks } from '../hooks/usePackingChecks';
+import { usePackingChecksShared } from '../hooks/usePackingChecksShared';
 import { usePackingOverrides } from '../hooks/usePackingOverrides';
 import { logAudit } from '../utils/audit';
 import type { Member, PackingItem } from '../types';
@@ -17,7 +18,17 @@ type EditPatch = Partial<Pick<PackingItem, 'name' | 'assigneeId'>>;
 export default function PackingPage() {
   const { user } = useCurrentUser();
   const { members } = useMembers();
-  const { isChecked, toggle } = usePackingChecks();
+  // 공용 항목: 모두 공유되는 체크 (Firestore)
+  // 개인 항목: 본인별 체크 (LocalStorage)
+  const sharedChecks = usePackingChecksShared();
+  const personalChecks = usePackingChecks();
+
+  const isChecked = (id: string, isPersonalItem: boolean) =>
+    isPersonalItem ? personalChecks.isChecked(id) : sharedChecks.isChecked(id);
+  const toggleCheck = (id: string, isPersonalItem: boolean) => {
+    if (isPersonalItem) personalChecks.toggle(id);
+    else void sharedChecks.toggle(id);
+  };
   const {
     items: customSharedItems,
     add: addCustomShared,
@@ -54,7 +65,9 @@ export default function PackingPage() {
   const isCustom = (id: string) => isCustomShared(id) || isCustomPersonal(id);
 
   const total = all.length;
-  const checkedCount = all.filter((p) => isChecked(p.id)).length;
+  const checkedCount = all.filter((p) =>
+    isChecked(p.id, p.type === '개인'),
+  ).length;
   const percent = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
 
   const handleAdd = async (input: Omit<PackingItem, 'id'>) => {
@@ -115,7 +128,7 @@ export default function PackingPage() {
       <div className="px-4 pt-5">
         <h1 className="text-xl font-black text-ink">준비물</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          체크는 본인별로 저장돼요. 개인 추가 항목은 본인만 보입니다.
+          공용은 모두 공유돼요. 개인 항목 체크와 본인 추가는 본인만 보입니다.
         </p>
       </div>
 
@@ -142,8 +155,8 @@ export default function PackingPage() {
             <PackingRow
               key={item.id}
               item={item}
-              checked={isChecked(item.id)}
-              onToggle={() => toggle(item.id)}
+              checked={isChecked(item.id, false)}
+              onToggle={() => toggleCheck(item.id, false)}
               members={members}
               isAdmin={isAdmin}
               canDelete={isAdmin && isCustom(item.id)}
@@ -161,11 +174,12 @@ export default function PackingPage() {
             <PackingRow
               key={item.id}
               item={item}
-              checked={isChecked(item.id)}
-              onToggle={() => toggle(item.id)}
+              checked={isChecked(item.id, true)}
+              onToggle={() => toggleCheck(item.id, true)}
               members={members}
               isAdmin={isAdmin}
-              canDelete={isAdmin && isCustom(item.id)}
+              // 개인 항목은 본인이 추가한 것만 본인이 삭제 가능
+              canDelete={isCustomPersonal(item.id)}
               onDelete={() => handleRemove(item)}
               onEdit={(patch) => handleEdit(item, patch)}
             />
