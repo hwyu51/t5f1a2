@@ -27,18 +27,18 @@ test.describe('기본 흐름', () => {
     await expect(page).toHaveURL(/\/schedule/);
     await expect(page.getByRole('heading', { name: '일정' })).toBeVisible();
 
-    // 숙소 탭
-    await page.getByRole('link', { name: /숙소/ }).click();
-    await expect(page).toHaveURL(/\/lodging/);
-    await expect(page.getByRole('heading', { name: '숙소' })).toBeVisible();
-
     // 준비물 탭
     await page.getByRole('link', { name: /준비물/ }).click();
     await expect(page).toHaveURL(/\/packing/);
     await expect(page.getByRole('heading', { name: '준비물' })).toBeVisible();
+
+    // 장보기 탭
+    await page.getByRole('link', { name: /장보기/ }).click();
+    await expect(page).toHaveURL(/\/shopping/);
+    await expect(page.getByRole('heading', { name: '장보기' })).toBeVisible();
   });
 
-  test('더보기 시트로 메뉴/장보기/정산 진입', async ({ page }) => {
+  test('더보기 시트로 메뉴/숙소/정산 진입', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: /지환/ }).first().click();
 

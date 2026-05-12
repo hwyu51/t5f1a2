@@ -11,8 +11,8 @@ type Tab = {
 const TABS: Tab[] = [
   { to: '/', label: '홈', icon: '🏠' },
   { to: '/schedule', label: '일정', icon: '📅' },
-  { to: '/lodging', label: '숙소', icon: '🏖' },
   { to: '/packing', label: '준비물', icon: '🎒' },
+  { to: '/shopping', label: '장보기', icon: '🛒' },
 ];
 
 const TAB_ITEM_CLASS =

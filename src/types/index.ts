@@ -23,7 +23,7 @@ export type Place = {
   address: string;
   lat: number;
   lng: number;
-  type: '집합' | '경유' | '숙소' | '마트' | '식당' | '관광' | '병원' | '기타';
+  type: '집합' | '경유' | '숙소' | '마트' | '식당' | '카페' | '관광' | '병원' | '기타';
   note?: string;
 };
 

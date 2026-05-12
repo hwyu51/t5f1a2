@@ -22,4 +22,5 @@ export const PACKING: PackingItem[] = [
   { id: 'p28', name: '개인 약', type: '개인' },
   { id: 'p29', name: '선크림', type: '개인' },
   { id: 'p30', name: '충전기 + 보조배터리', type: '개인' },
+  { id: 'p31', name: '방수팩', type: '개인' },
 ];

@@ -13,7 +13,7 @@ type Item = {
 
 const ITEMS: Item[] = [
   { to: '/menus', label: '메뉴', icon: '🍖', desc: '바베큐/안주 선택' },
-  { to: '/shopping', label: '장보기', icon: '🛒', desc: '식재료 자동 집계' },
+  { to: '/lodging', label: '숙소', icon: '🏖', desc: '펜션 정보 및 길찾기' },
   { to: '/budget', label: '정산', icon: '💰', desc: '지출 및 N분의1 정산' },
 ];
 

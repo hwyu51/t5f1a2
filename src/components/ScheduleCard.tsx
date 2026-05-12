@@ -7,6 +7,7 @@ const CATEGORY_LABELS: Partial<Record<Place['type'], { icon: string; label: stri
   경유: { icon: '⛽', label: '휴게소' },
   마트: { icon: '🛒', label: '마트' },
   식당: { icon: '🍽', label: '식당' },
+  카페: { icon: '☕', label: '카페' },
 };
 
 type Props = {

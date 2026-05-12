@@ -97,6 +97,73 @@ function buildWebFallback(app: NavApp, target: NavTarget): string {
   }
 }
 
+/**
+ * 티맵 다중 경유지 길찾기 URL.
+ * 출발지는 현재 위치 자동 사용. waypoints의 마지막이 도착지, 나머지가 경유지.
+ * 좌표 없는 (lat=0 || lng=0) 지점은 자동 제외.
+ */
+export function buildTmapMultiRouteUrl(
+  waypoints: Array<{ name: string; lat: number; lng: number }>,
+): string | null {
+  const valid = waypoints.filter((w) => w.lat && w.lng);
+  if (valid.length === 0) return null;
+
+  const goal = valid[valid.length - 1];
+  const vias = valid.slice(0, -1);
+
+  const params: string[] = [
+    `goalname=${encodeURIComponent(goal.name)}`,
+    `goalx=${goal.lng}`,
+    `goaly=${goal.lat}`,
+  ];
+  vias.forEach((wp, i) => {
+    const n = i + 1;
+    params.push(`via${n}name=${encodeURIComponent(wp.name)}`);
+    params.push(`via${n}x=${wp.lng}`);
+    params.push(`via${n}y=${wp.lat}`);
+  });
+  return `tmap://route?${params.join('&')}`;
+}
+
+/**
+ * 다중 경유지 길찾기 실행. 모바일이 아니거나 티맵 미설치면 안내.
+ */
+export function openMultiRoute(
+  waypoints: Array<{ name: string; lat: number; lng: number }>,
+): void {
+  const mobile = isMobile();
+  if (!mobile) {
+    window.alert('다중 경유지 길찾기는 모바일 티맵 앱에서만 동작합니다.');
+    return;
+  }
+  const url = buildTmapMultiRouteUrl(waypoints);
+  if (!url) {
+    window.alert('경로의 좌표 정보가 부족합니다.');
+    return;
+  }
+
+  let didOpen = false;
+  const onHide = () => {
+    didOpen = true;
+  };
+  const events: Array<keyof WindowEventMap> = ['blur', 'pagehide'];
+  const onVisibility = () => {
+    if (document.visibilityState === 'hidden') didOpen = true;
+  };
+  events.forEach((e) => window.addEventListener(e, onHide));
+  document.addEventListener('visibilitychange', onVisibility);
+
+  window.location.href = url;
+
+  window.setTimeout(() => {
+    events.forEach((e) => window.removeEventListener(e, onHide));
+    document.removeEventListener('visibilitychange', onVisibility);
+    if (!didOpen && document.visibilityState === 'visible') {
+      window.alert('티맵 앱이 필요합니다. 앱스토어/플레이스토어에서 설치해 주세요.');
+    }
+  }, 1500);
+}
+
 export function openNav(app: NavApp, target: NavTarget): void {
   const mobile = isMobile();
 
