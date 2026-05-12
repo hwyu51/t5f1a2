@@ -27,7 +27,7 @@ export default function SchedulePage() {
   );
 
   // 1일차 전체 경로: 사용자 선택한 휴게소/마트 → 숙소
-  // 미선택 시 추천 후보 (행담도, S-mart)
+  // 미선택 시 추천 후보 (행담도, S-mart). 경로 표시/티맵엔 추천 ⭐ 제거.
   const day1Route = useMemo(() => {
     const restId = choices['s03'] ?? 'rest-haengdam';
     const martId = choices['s04'] ?? 'mart-smart';
@@ -36,7 +36,11 @@ export default function SchedulePage() {
     const lodging = PLACES.find((p) => p.id === 'lodging');
     return [rest, mart, lodging]
       .filter((p): p is NonNullable<typeof p> => Boolean(p))
-      .map((p) => ({ name: p.name, lat: p.lat, lng: p.lng }));
+      .map((p) => ({
+        name: p.name.replace(/\s*⭐\s*/g, '').trim(),
+        lat: p.lat,
+        lng: p.lng,
+      }));
   }, [choices]);
 
   return (
