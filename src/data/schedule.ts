@@ -114,7 +114,7 @@ export const SCHEDULE: ScheduleItem[] = [
     time: '11:30',
     title: '아침 — 게국지 해장',
     placeOptions: ['restaurant-samsam', 'restaurant-pungmi'],
-    note: '체크아웃 후 식당 이동. 추천: 대천삼삼꽃게장 (평점 4.6) / 풍미꽃게장게국지(리뷰 많음)',
+    note: '체크아웃 후 식당 이동. 추천: 대천삼삼꽃게장 (평점 4.6) / 풍미꽃게장게국지(리뷰 많음)\n💵 머드축제 상품권 (5,000원 × 6매 = 30,000원) 쓸 수 있는 곳으로 가는 게 좋음',
   },
   {
     id: 's16',

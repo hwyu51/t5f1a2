@@ -15,6 +15,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
   const [payerId, setPayerId] = useState<string>('');
   const [amountStr, setAmountStr] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
+  const [note, setNote] = useState<string>('');
   const [splitMode, setSplitMode] = useState<'all' | 'subset'>('all');
   const [participantIds, setParticipantIds] = useState<string[]>([]);
   const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
@@ -26,6 +27,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
       setPayerId(initial.payerId);
       setAmountStr(initial.amount.toLocaleString('ko-KR'));
       setMemo(initial.memo);
+      setNote(initial.note ?? '');
       setSplitMode(initial.splitMode);
       setParticipantIds(initial.participantIds ?? []);
       setDate(initial.date);
@@ -34,6 +36,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
       setPayerId('');
       setAmountStr('');
       setMemo('');
+      setNote('');
       setSplitMode('all');
       setParticipantIds([]);
       setDate(new Date().toISOString().slice(0, 10));
@@ -78,6 +81,9 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
       date,
       pending,
     };
+    if (note.trim()) {
+      data.note = note.trim();
+    }
     if (splitMode === 'subset') {
       data.participantIds = participantIds;
     }
@@ -141,7 +147,7 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
             />
           </Field>
 
-          <Field label="메모">
+          <Field label="이름">
             <input
               type="text"
               value={memo}
@@ -150,6 +156,17 @@ export default function ExpenseForm({ open, initial, onClose, onSubmit }: Props)
               maxLength={50}
               className="w-full rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm"
               placeholder="예: 마트 장보기"
+            />
+          </Field>
+
+          <Field label="메모 (선택)">
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
+              maxLength={300}
+              className="w-full resize-none rounded-lg border border-line bg-cream-50 px-3 py-2 text-sm"
+              placeholder="자유 메모 (영수증 위치, 부연 설명 등)"
             />
           </Field>
 

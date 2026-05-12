@@ -296,6 +296,16 @@ export default function BudgetPage() {
                           </span>
                         </div>
                       )}
+                      {e.note && (
+                        <div className="rounded-md bg-cream-100 px-2 py-1.5">
+                          <div className="text-[10px] font-bold text-ink-muted">
+                            메모
+                          </div>
+                          <p className="mt-0.5 whitespace-pre-line text-xs text-ink">
+                            {e.note}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 
