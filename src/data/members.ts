@@ -8,6 +8,6 @@ export const MEMBERS: Member[] = [
   { id: 'byungdo', name: '병도',  emoji: '🔧', mbti: 'ISTP', confirmed: true /* 차분한 어른 */ },
   { id: 'hyewon',  name: '혜원',  emoji: '👑', mbti: 'ENTJ', confirmed: true /* 말괄량이 */ },
   { id: 'miseo',   name: '미서',  emoji: '📋', mbti: 'ISTJ', confirmed: true /* ISTP 스타일이라 했는데 ISTJ로 정정 */ },
-  { id: 'jongmin', name: '종민',  confirmed: false /* 미정 */ },
+  // 종민: 최종 불참 확정 (2026-07-20) — 명단에서 제외. 참여 7명.
 ];
 // 차량 1대 렌트 (8인승급). 운전 가능: 지환·지빈.

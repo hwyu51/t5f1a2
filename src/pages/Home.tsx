@@ -5,10 +5,8 @@ import MiniSchedule from '../components/MiniSchedule';
 import Section from '../components/Section';
 import { PLACES } from '../data/places';
 import { TRIP } from '../data/trip';
-import { useAdminMode } from '../hooks/useAdminMode';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useMembers } from '../hooks/useMembers';
-import { logAudit } from '../utils/audit';
 
 const TARGET_ISO = `${TRIP.startDate}T${TRIP.departureTime}:00+09:00`;
 
@@ -32,10 +30,8 @@ const ALERTS = [
 
 export default function Home() {
   const { user, clear } = useCurrentUser();
-  const { members, setConfirmed } = useMembers();
-  const { isAdmin } = useAdminMode();
+  const { members } = useMembers();
   const meetingPlace = PLACES.find((p) => p.id === TRIP.meetingPlaceId);
-  const jongmin = members.find((m) => m.id === 'jongmin');
 
   return (
     <div className="space-y-5 pb-4">
@@ -94,40 +90,6 @@ export default function Home() {
           ))}
         </div>
       </Section>
-
-      {/* 관리자 — 종민 합류 토글 */}
-      {isAdmin && jongmin && (
-        <Section title="🔧 관리자">
-          <Card className="!p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-ink">
-                {jongmin.emoji ?? '❓'} 종민 합류 ·{' '}
-                <span className={jongmin.confirmed ? 'font-bold text-green-700' : 'font-bold text-ink-muted'}>
-                  {jongmin.confirmed ? '확정' : '미정'}
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !jongmin.confirmed;
-                  setConfirmed('jongmin', next);
-                  if (user) {
-                    void logAudit({
-                      actorId: user.id,
-                      actorName: user.name,
-                      action: '종민 합류',
-                      target: next ? '확정' : '미정',
-                    });
-                  }
-                }}
-                className="rounded-lg border border-orange-500 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700"
-              >
-                {jongmin.confirmed ? '미정으로' : '확정으로'}
-              </button>
-            </div>
-          </Card>
-        </Section>
-      )}
 
       {/* 챙길 것 알림 */}
       <Section title="⚠️ 꼭 챙겨오세요">

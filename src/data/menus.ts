@@ -1,16 +1,16 @@
 import type { Menu } from '../types';
 
 export const MENUS: Menu[] = [
-  // === 바베큐 4종 (식사, 8인분) ===
+  // === 바베큐 4종 (식사, 7인분) ===
   {
     id: 'bbq-pork',
     name: '삼겹살/목살 바베큐',
     category: '식사',
-    servings: 8,
+    servings: 7,
     notes: '1인당 200~250g. 굵은소금 + 쌈장 필수. 펜션 실내 그릴 사용',
     ingredients: [
-      { name: '삼겹살',     amount: '2kg',    category: '정육' },
-      { name: '목살',       amount: '1kg',    category: '정육' },
+      { name: '삼겹살',     amount: '1.5kg',  category: '정육' },
+      { name: '목살',       amount: '0.7kg',  category: '정육' },
       { name: '상추',       amount: '충분히', category: '채소' },
       { name: '깻잎',       amount: '2단',    category: '채소' },
       { name: '마늘',       amount: '1망',    category: '채소' },
@@ -23,10 +23,10 @@ export const MENUS: Menu[] = [
     id: 'smoked-pork',
     name: '훈제 통삼겹 (훈제박스)',
     category: '식사',
-    servings: 8,
+    servings: 7,
     notes: '훈제박스 1시간 돌려놓고 머드 갔다 오면 딱 익어 있음',
     ingredients: [
-      { name: '통삼겹',     amount: '2kg',    category: '정육' },
+      { name: '통삼겹',     amount: '1.5kg',  category: '정육' },
       { name: '훈제박스',   amount: '1개',    category: '잡화', note: '⚠️ 일회용 사야 됨' },
       { name: '훈제칩',     amount: '1봉',    category: '잡화', optional: true },
     ],
@@ -35,10 +35,10 @@ export const MENUS: Menu[] = [
     id: 'oven-belly',
     name: '통오겹 오븐구이 (지빈 담당)',
     category: '식사',
-    servings: 8,
+    servings: 7,
     notes: '지빈 시그니처. 펜션 오븐 쓸 수 있는지 확인 필요',
     ingredients: [
-      { name: '통오겹',     amount: '2kg',    category: '정육' },
+      { name: '통오겹',     amount: '1.5kg',  category: '정육' },
       { name: '허브솔트',   amount: '1통',    category: '소스/양념' },
       { name: '로즈마리',   amount: '1팩',    category: '채소' },
     ],
@@ -47,10 +47,10 @@ export const MENUS: Menu[] = [
     id: 'bbq-crab',
     name: '꽃게 호일구이 (혜원이 하고 싶은)',
     category: '식사',
-    servings: 8,
+    servings: 7,
     notes: '호일에 싸서 그릴에 올리기. 마요네즈 곁들이기',
     ingredients: [
-      { name: '꽃게',       amount: '8마리',  category: '정육' },
+      { name: '꽃게',       amount: '7마리',  category: '정육' },
       { name: '호일',       amount: '1롤',    category: '잡화' },
       { name: '마요네즈',   amount: '1통',    category: '소스/양념' },
       { name: '버터',       amount: '1통',    category: '소스/양념' },
@@ -108,6 +108,211 @@ export const MENUS: Menu[] = [
       { name: '계란',       amount: '5개',    category: '잡화' },
       { name: '시금치',     amount: '1/2단',  category: '채소' },
       { name: '참기름',     amount: '1병',    category: '소스/양념' },
+    ],
+  },
+
+  // === 신규 추가 (7명 기준, 2026-07-20) ===
+
+  // --- 식사 ---
+  {
+    id: 'bossam',
+    name: '보쌈수육',
+    category: '식사',
+    servings: 7,
+    notes: '통삼겹/앞다리 삶아서 쌈으로. 새우젓·명이나물이랑 같이',
+    ingredients: [
+      { name: '통삼겹(수육용)', amount: '1.5kg',  category: '정육' },
+      { name: '된장',           amount: '1통',    category: '소스/양념', note: '누린내 제거용' },
+      { name: '대파',           amount: '1대',    category: '채소' },
+      { name: '마늘',           amount: '1줌',    category: '채소' },
+      { name: '통후추',         amount: '1봉',    category: '소스/양념', optional: true },
+      { name: '월계수잎',       amount: '약간',   category: '소스/양념', optional: true },
+      { name: '새우젓',         amount: '1통',    category: '소스/양념' },
+      { name: '쌈채소(상추/깻잎)', amount: '충분히', category: '채소' },
+    ],
+  },
+  {
+    id: 'jjimdak',
+    name: '찜닭',
+    category: '식사',
+    servings: 7,
+    notes: '당면 넉넉히. 안동찜닭 스타일',
+    ingredients: [
+      { name: '닭(볶음탕용)',   amount: '2마리',  category: '정육' },
+      { name: '감자',           amount: '3개',    category: '채소' },
+      { name: '당근',           amount: '1개',    category: '채소' },
+      { name: '양파',           amount: '2개',    category: '채소' },
+      { name: '대파',           amount: '1대',    category: '채소' },
+      { name: '청양고추',       amount: '3개',    category: '채소' },
+      { name: '당면',           amount: '1봉',    category: '잡화' },
+      { name: '간장',           amount: '1병',    category: '소스/양념' },
+      { name: '올리고당',       amount: '1병',    category: '소스/양념' },
+      { name: '마늘',           amount: '1줌',    category: '채소' },
+    ],
+  },
+  {
+    id: 'doenjang-jjigae',
+    name: '된장찌개',
+    category: '식사',
+    servings: 7,
+    notes: '해장용. 아침에 끓이기 좋음',
+    ingredients: [
+      { name: '된장',           amount: '1통',    category: '소스/양념' },
+      { name: '두부',           amount: '1모',    category: '잡화' },
+      { name: '애호박',         amount: '1개',    category: '채소' },
+      { name: '양파',           amount: '1개',    category: '채소' },
+      { name: '감자',           amount: '2개',    category: '채소' },
+      { name: '대파',           amount: '1대',    category: '채소' },
+      { name: '청양고추',       amount: '3개',    category: '채소' },
+      { name: '다시팩',         amount: '1봉',    category: '소스/양념', optional: true },
+    ],
+  },
+  {
+    id: 'bibim-myeon',
+    name: '비빔면',
+    category: '식사',
+    servings: 7,
+    notes: '고기 먹고 마무리용. 양념 동봉 제품',
+    ingredients: [
+      { name: '비빔면',         amount: '7인분',  category: '잡화' },
+      { name: '오이',           amount: '2개',    category: '채소' },
+      { name: '삶은계란',       amount: '4개',    category: '잡화' },
+      { name: '김가루',         amount: '1봉',    category: '잡화', optional: true },
+    ],
+  },
+
+  // --- 안주 ---
+  {
+    id: 'eggs-in-hell',
+    name: '에그인헬',
+    category: '안주',
+    servings: 4,
+    notes: '토마토소스에 계란. 빵 찍어 먹기',
+    ingredients: [
+      { name: '토마토소스(파스타소스)', amount: '2병', category: '소스/양념' },
+      { name: '방울토마토',     amount: '1팩',    category: '채소' },
+      { name: '양파',           amount: '1개',    category: '채소' },
+      { name: '파프리카',       amount: '1개',    category: '채소' },
+      { name: '계란',           amount: '6개',    category: '잡화' },
+      { name: '소시지',         amount: '1팩',    category: '정육' },
+      { name: '올리브유',       amount: '1병',    category: '소스/양념' },
+      { name: '바게트/빵',      amount: '1개',    category: '잡화' },
+    ],
+  },
+  {
+    id: 'dak-skewer',
+    name: '닭꼬치',
+    category: '안주',
+    servings: 4,
+    notes: '냉동 데워서. 술안주 굿',
+    ingredients: [
+      { name: '닭꼬치(냉동)',   amount: '2팩',    category: '정육' },
+      { name: '닭꼬치소스',     amount: '1병',    category: '소스/양념' },
+    ],
+  },
+  {
+    id: 'smoked-duck',
+    name: '훈제오리',
+    category: '안주',
+    servings: 4,
+    notes: '부추무침이랑 같이',
+    ingredients: [
+      { name: '훈제오리',       amount: '2팩',    category: '정육' },
+      { name: '부추',           amount: '1단',    category: '채소' },
+    ],
+  },
+  {
+    id: 'scallop-cheese',
+    name: '가리비치즈구이',
+    category: '안주',
+    servings: 4,
+    notes: '가리비에 모짜렐라 올려 그릴/오븐',
+    ingredients: [
+      { name: '가리비',         amount: '15개',   category: '정육' },
+      { name: '모짜렐라치즈',   amount: '1봉',    category: '잡화' },
+      { name: '버터',           amount: '1통',    category: '소스/양념' },
+      { name: '마늘',           amount: '1줌',    category: '채소' },
+    ],
+  },
+  {
+    id: 'cheese-egg-roll',
+    name: '치즈계란말이',
+    category: '안주',
+    servings: 4,
+    ingredients: [
+      { name: '계란',           amount: '8개',    category: '잡화' },
+      { name: '슬라이스치즈',   amount: '1봉',    category: '잡화' },
+      { name: '대파',           amount: '1대',    category: '채소', optional: true },
+      { name: '맛소금',         amount: '1봉',    category: '소스/양념', optional: true },
+    ],
+  },
+  {
+    id: 'tuna-mayo-canape',
+    name: '참치마요 크래커 카나페',
+    category: '안주',
+    servings: 4,
+    notes: '크래커에 참치마요 올리기. 손 안 대고 뚝딱',
+    ingredients: [
+      { name: '참치캔',         amount: '2개',    category: '잡화' },
+      { name: '마요네즈',       amount: '1통',    category: '소스/양념' },
+      { name: '크래커(리츠)',   amount: '1통',    category: '잡화' },
+      { name: '옥수수콘',       amount: '1캔',    category: '잡화', optional: true },
+      { name: '양파',           amount: '1/2개',  category: '채소', optional: true },
+    ],
+  },
+  {
+    id: 'myeongi-namul',
+    name: '명이나물 (쌈)',
+    category: '안주',
+    servings: 7,
+    notes: '보쌈·바베큐 쌈용 절임',
+    ingredients: [
+      { name: '명이나물 절임',  amount: '2팩',    category: '채소' },
+    ],
+  },
+
+  // --- 간식 ---
+  {
+    id: 'watermelon',
+    name: '수박',
+    category: '간식',
+    servings: 7,
+    ingredients: [
+      { name: '수박',           amount: '1통',    category: '과일' },
+    ],
+  },
+  {
+    id: 'ice-cream',
+    name: '아이스크림',
+    category: '간식',
+    notes: '냉동실 자리 확인',
+    ingredients: [
+      { name: '아이스크림',     amount: '넉넉히',  category: '잡화' },
+    ],
+  },
+
+  // --- 음료 & 술 (7명 1박2일 기준) ---
+  {
+    id: 'drinks',
+    name: '음료 · 물',
+    category: '간식',
+    servings: 7,
+    notes: '차량 아이스박스에 미리. 얼음 넉넉히',
+    ingredients: [
+      { name: '생수(2L)',       amount: '6병',    category: '음료' },
+      { name: '탄산음료(콜라/사이다)', amount: '2L 3병', category: '음료' },
+      { name: '이온음료',       amount: '6개',    category: '음료', note: '해장용' },
+      { name: '커피(믹스/캔)',  amount: '1박스',  category: '음료', optional: true },
+      { name: '얼음',           amount: '2봉',    category: '잡화' },
+    ],
+  },
+  {
+    id: 'alcohol',
+    name: '술',
+    category: '안주',
+    notes: '현지 마트에서 사도 됨. 음주 시 운전 X',
+    ingredients: [
+      { name: '술',             amount: '',       category: '주류', note: '종류·양 현장에서' },
     ],
   },
 ];
